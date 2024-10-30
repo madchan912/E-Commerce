@@ -1,13 +1,12 @@
 package com.sparta.ecommerce.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import lombok.Data;
 
 @Entity
+@Table(name = "orders") // 테이블 이름을 "orders"로 설정하여 예약어 충돌 방지
 @Data
 public class Order {
     @Id
