@@ -1,7 +1,11 @@
 package com.sparta.ecommerce.service;
 
+import com.sparta.ecommerce.entity.Product;
 import com.sparta.ecommerce.repository.ProductRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -11,5 +15,34 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    // 상품 관련 비즈니스 로직 추가 가능
+    // Create a new product
+    public Product createProduct(Product product) {
+        return productRepository.save(product);
+    }
+
+    // Get all products
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
+    }
+
+    // Get a product by ID
+    public Optional<Product> getProductById(Long id) {
+        return productRepository.findById(id);
+    }
+
+    // Update a product
+    public Product updateProduct(Long id, Product productDetails) {
+        return productRepository.findById(id)
+                .map(product -> {
+                    product.setName(productDetails.getName());
+                    product.setPrice(productDetails.getPrice());
+                    product.setDescription(productDetails.getDescription());
+                    return productRepository.save(product);
+                }).orElse(null);
+    }
+
+    // Delete a product
+    public void deleteProduct(Long id) {
+        productRepository.deleteById(id);
+    }
 }
