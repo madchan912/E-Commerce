@@ -2,7 +2,9 @@ package com.sparta.ecommerce.service;
 
 import com.sparta.ecommerce.entity.Order;
 import com.sparta.ecommerce.repository.OrderRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,6 +43,10 @@ public class OrderService {
     }
 
     public void deleteOrder(Long id) {
-        orderRepository.deleteById(id);
+        if(orderRepository.existsById(id)) {
+            orderRepository.deleteById(id);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+        }
     }
 }

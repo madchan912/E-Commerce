@@ -2,7 +2,9 @@ package com.sparta.ecommerce.service;
 
 import com.sparta.ecommerce.entity.Product;
 import com.sparta.ecommerce.repository.ProductRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +45,10 @@ public class ProductService {
 
     // Delete a product
     public void deleteProduct(Long id) {
-        productRepository.deleteById(id);
+        if (productRepository.existsById(id)) {
+            productRepository.deleteById(id);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+        }
     }
 }
