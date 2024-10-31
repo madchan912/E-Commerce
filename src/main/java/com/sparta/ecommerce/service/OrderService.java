@@ -4,6 +4,7 @@ import com.sparta.ecommerce.entity.Order;
 import com.sparta.ecommerce.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,7 @@ public class OrderService {
     }
 
     public Order createOrder(Order order) {
+        order.setOrderDate(LocalDateTime.now());
         return orderRepository.save(order);
     }
 
@@ -33,7 +35,7 @@ public class OrderService {
                     order.setUserId(orderDetails.getUserId());
                     order.setProductId(orderDetails.getProductId());
                     order.setQuantity(orderDetails.getQuantity());
-                    order.setOrderDate(orderDetails.getOrderDate());
+                    order.setOrderDate(LocalDateTime.now());
                     return orderRepository.save(order);
                 }).orElse(null);
     }
