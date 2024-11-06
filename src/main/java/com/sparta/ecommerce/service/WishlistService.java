@@ -1,6 +1,8 @@
 package com.sparta.ecommerce.service;
 
 import com.sparta.ecommerce.entity.Wishlist;
+import com.sparta.ecommerce.repository.ProductRepository;
+import com.sparta.ecommerce.repository.UserRepository;
 import com.sparta.ecommerce.repository.WishlistRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,16 +15,30 @@ import java.util.Optional;
 public class WishlistService {
 
     private final WishlistRepository wishlistRepository;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
 
-    public WishlistService(WishlistRepository wishlistRepository) {
+    public WishlistService(WishlistRepository wishlistRepository, UserRepository userRepository, ProductRepository productRepository) {
         this.wishlistRepository = wishlistRepository;
+        this.userRepository = userRepository;
+        this.productRepository = productRepository;
     }
 
     // 위시리스트에 아이템 추가
     public Wishlist addToWishlist(Long userId, Long productId) {
-        // 중복 방지: 위시리스트에 이미 존재하는 경우 null 반환
+        // 사용자 존재 확인
+        if (!userRepository.existsById(userId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+
+        // 상품 존재 확인
+        if (!productRepository.existsById(productId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+        }
+
+        // 중복 방지: 이미 위시리스트에 존재하는 경우 예외 발생
         if (wishlistRepository.findByUserIdAndProductId(userId, productId) != null) {
-            return null;
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Product already in wishlist");
         }
 
         Wishlist wishlist = new Wishlist();
