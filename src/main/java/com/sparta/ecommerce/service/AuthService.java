@@ -5,6 +5,7 @@ import com.sparta.ecommerce.entity.User;
 import com.sparta.ecommerce.entity.VerificationToken;
 import com.sparta.ecommerce.repository.UserRepository;
 import com.sparta.ecommerce.repository.VerificationTokenRepository;
+import com.sparta.ecommerce.util.AESUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,9 +35,9 @@ public class AuthService {
         }
 
         User user = new User();
-        user.setName(requestDto.getName());
-        user.setEmail(requestDto.getEmail());
-        user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+        user.setName(AESUtil.encrypt(requestDto.getName())); // 이름 암호화
+        user.setEmail(AESUtil.encrypt(requestDto.getEmail())); // 이메일 암호화
+        user.setPassword(passwordEncoder.encode(requestDto.getPassword())); // 비밀번호 해싱
         user.setVerified(false); // 이메일 인증 전
 
         User savedUser = userRepository.save(user);
@@ -53,9 +54,9 @@ public class AuthService {
         // 이메일 인증 링크 생성 및 전송
         String verificationLink = "http://localhost:8080/auth/verify?token=" + token;
         emailService.sendEmail(
-                savedUser.getEmail(),
+                requestDto.getEmail(),
                 "이메일 인증 요청",
-                "안녕하세요, " + savedUser.getName() + "님!\n다음 링크를 클릭하여 이메일을 인증하세요: " + verificationLink
+                "안녕하세요, " + requestDto.getName() + "님!\n다음 링크를 클릭하여 이메일을 인증하세요: " + verificationLink
         );
     }
 
