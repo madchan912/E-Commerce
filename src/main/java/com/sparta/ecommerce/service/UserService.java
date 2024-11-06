@@ -18,11 +18,6 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    // 새로운 사용자를 추가합니다.
-    public User createUser(User user) {
-        return userRepository.save(user);
-    }
-
     // 모든 사용자를 조회합니다.
     public List<User> getAllUsers() {
         return userRepository.findAll();
