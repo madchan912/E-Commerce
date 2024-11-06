@@ -2,7 +2,9 @@ package com.sparta.ecommerce.service;
 
 import com.sparta.ecommerce.entity.Wishlist;
 import com.sparta.ecommerce.repository.WishlistRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +41,8 @@ public class WishlistService {
         Wishlist wishlistItem = wishlistRepository.findByUserIdAndProductId(userId, productId);
         if (wishlistItem != null) {
             wishlistRepository.delete(wishlistItem);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Wishlist item not found");
         }
     }
 }

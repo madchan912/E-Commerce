@@ -2,8 +2,8 @@ package com.sparta.ecommerce.service;
 
 import com.sparta.ecommerce.entity.Product;
 import com.sparta.ecommerce.repository.ProductRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -11,28 +11,29 @@ import java.util.Optional;
 
 @Service
 public class ProductService {
+
     private final ProductRepository productRepository;
 
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 
-    // Create a new product
+    // 새로운 상품을 추가합니다.
     public Product createProduct(Product product) {
         return productRepository.save(product);
     }
 
-    // Get all products
+    // 모든 상품을 조회합니다.
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-    // Get a product by ID
+    // ID로 특정 상품을 조회합니다.
     public Optional<Product> getProductById(Long id) {
         return productRepository.findById(id);
     }
 
-    // Update a product
+    // 특정 상품의 정보를 업데이트합니다.
     public Product updateProduct(Long id, Product productDetails) {
         return productRepository.findById(id)
                 .map(product -> {
@@ -40,10 +41,10 @@ public class ProductService {
                     product.setPrice(productDetails.getPrice());
                     product.setDescription(productDetails.getDescription());
                     return productRepository.save(product);
-                }).orElse(null);
+                }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
     }
 
-    // Delete a product
+    // 특정 상품을 삭제합니다.
     public void deleteProduct(Long id) {
         if (productRepository.existsById(id)) {
             productRepository.deleteById(id);
