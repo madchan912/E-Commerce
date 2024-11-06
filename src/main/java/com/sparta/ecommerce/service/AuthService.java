@@ -38,6 +38,8 @@ public class AuthService {
         user.setName(AESUtil.encrypt(requestDto.getName())); // 이름 암호화
         user.setEmail(AESUtil.encrypt(requestDto.getEmail())); // 이메일 암호화
         user.setPassword(passwordEncoder.encode(requestDto.getPassword())); // 비밀번호 해싱
+        user.setPhoneNumber(AESUtil.encrypt(requestDto.getPhoneNumber())); // 전화번호 암호화
+        user.setAddress(AESUtil.encrypt(requestDto.getAddress())); // 주소 암호화
         user.setVerified(false); // 이메일 인증 전
 
         User savedUser = userRepository.save(user);
