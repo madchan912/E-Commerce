@@ -14,4 +14,5 @@ public class User {
     private String name;
     private String email;
     private String password;
+    private boolean isVerified; // 이메일 인증 여부
 }

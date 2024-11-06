@@ -29,6 +29,13 @@ dependencies {
 
     // PostgreSQL 의존성 추가
     implementation 'org.postgresql:postgresql:42.2.5'
+
+    // Spring Security 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // Spring Boot Starter Mail 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
 }
 
 tasks.named('test') {

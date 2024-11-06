@@ -17,17 +17,6 @@ public class UserController {
     }
 
     /**
-     * 사용자 등록
-     *
-     * @param user 등록할 사용자 정보
-     * @return 등록된 사용자
-     */
-    @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
-    }
-
-    /**
      * 모든 사용자 조회
      *
      * @return 사용자 목록
