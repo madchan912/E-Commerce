@@ -1,11 +1,9 @@
 package com.sparta.ecommerce.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Entity
 @Table(name = "wishlist")
@@ -13,9 +11,8 @@ import lombok.Data;
 public class Wishlist {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;  // 유저 ID를 기본키로 설정
 
-    private Long userId;  // 사용자의 ID
-    private Long productId;  // 제품의 ID
+    @ElementCollection
+    private List<Long> productIds;  // 상품 ID 목록
 }

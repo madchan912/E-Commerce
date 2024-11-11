@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,29 +37,40 @@ public class WishlistService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
         }
 
+        // 위시리스트 조회 또는 새로 생성
+        Wishlist wishlist = wishlistRepository.findByUserId(userId);
+        if (wishlist == null) {
+            wishlist = new Wishlist();
+            wishlist.setUserId(userId);
+            wishlist.setProductIds(new ArrayList<>());
+        }
+
         // 중복 방지: 이미 위시리스트에 존재하는 경우 예외 발생
-        if (wishlistRepository.findByUserIdAndProductId(userId, productId) != null) {
+        if (wishlist.getProductIds().contains(productId)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Product already in wishlist");
         }
 
-        Wishlist wishlist = new Wishlist();
-        wishlist.setUserId(userId);
-        wishlist.setProductId(productId);
+        wishlist.getProductIds().add(productId);
         return wishlistRepository.save(wishlist);
     }
 
     // 특정 사용자의 위시리스트 조회
-    public List<Wishlist> getWishlistByUserId(Long userId) {
-        return wishlistRepository.findByUserId(userId);
+    public Wishlist getWishlistByUserId(Long userId) {
+        Wishlist wishlist = wishlistRepository.findByUserId(userId);
+        if (wishlist == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Wishlist not found");
+        }
+        return wishlist;
     }
 
     // 위시리스트에서 특정 아이템 삭제
     public void removeFromWishlist(Long userId, Long productId) {
-        Wishlist wishlistItem = wishlistRepository.findByUserIdAndProductId(userId, productId);
-        if (wishlistItem != null) {
-            wishlistRepository.delete(wishlistItem);
-        } else {
+        Wishlist wishlist = wishlistRepository.findByUserId(userId);
+        if (wishlist == null || !wishlist.getProductIds().contains(productId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Wishlist item not found");
         }
+
+        wishlist.getProductIds().remove(productId);
+        wishlistRepository.save(wishlist); // 변경된 위시리스트 저장
     }
 }
