@@ -107,4 +107,27 @@ public class OrderService {
         existingOrder.setStatus(Order.OrderStatus.CANCELED);
         orderRepository.save(existingOrder);
     }
+
+    // 주문 반품
+    public void returnOrder(Long orderId) {
+        // 주문 조회
+        Order existingOrder = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+
+        // 주문 상태가 'DELIVERED'이어야 반품 가능
+        if (existingOrder.getStatus() != Order.OrderStatus.DELIVERED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only delivered orders can be returned.");
+        }
+
+        // 배송 완료 후 D+1일까지만 반품 가능
+        LocalDateTime deliveryDate = existingOrder.getOrderDate().plusDays(1); // 주문 날짜 + 1일
+        if (LocalDateTime.now().isAfter(deliveryDate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Return period has expired.");
+        }
+
+        // 주문 상태를 'RETURNED'로 업데이트
+        existingOrder.setStatus(Order.OrderStatus.RETURNED);
+        orderRepository.save(existingOrder);
+    }
+
 }

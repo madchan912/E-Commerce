@@ -81,4 +81,15 @@ public class OrderController {
         orderService.cancelOrder(id);
         return ResponseEntity.ok("Order has been canceled successfully.");
     }
+
+    /**
+     * 
+     * @param id 조회할 주문 ID 
+     * @return 반품 여부
+     */
+    @PostMapping("/{id}/return")
+    public ResponseEntity<String> returnOrder(@PathVariable Long id) {
+        orderService.returnOrder(id);
+        return ResponseEntity.ok("Order has been returned successfully.");
+    }
 }
