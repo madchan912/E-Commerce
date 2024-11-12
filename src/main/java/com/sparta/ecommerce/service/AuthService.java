@@ -6,11 +6,13 @@ import com.sparta.ecommerce.entity.VerificationToken;
 import com.sparta.ecommerce.repository.UserRepository;
 import com.sparta.ecommerce.repository.VerificationTokenRepository;
 import com.sparta.ecommerce.util.AESUtil;
+import com.sparta.ecommerce.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,6 +29,9 @@ public class AuthService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     // 회원가입 및 이메일 인증 토큰 생성
     public void signUp(SignUpRequestDto requestDto) {
@@ -76,5 +81,32 @@ public class AuthService {
 
         user.setVerified(true); // 사용자 활성화
         userRepository.save(user);
+    }
+
+    // 로그인 기능 추가
+    public String login(String email, String password) {
+        // 이메일을 암호화한 후 데이터베이스에서 조회
+        Optional<User> userOptional = userRepository.findByEmail(AESUtil.encrypt(email));
+        
+        // 사용자 존재 여부
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException("Invalid email or password");
+        }
+        
+        User user = userOptional.get();
+        
+        // 암호 일치 여부
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid email or password");
+        }
+
+        // 이메일 인증 여부
+        if (!user.isVerified()) {
+            throw new RuntimeException("Email not verified");
+        }
+
+        // 이메일 복호화 하여 JWT 토큰생성
+        String decryptedEmail = AESUtil.decrypt(user.getEmail());
+        return jwtUtil.generateToken(decryptedEmail);
     }
 }

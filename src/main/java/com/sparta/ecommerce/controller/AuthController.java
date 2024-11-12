@@ -36,4 +36,17 @@ public class AuthController {
         authService.verifyEmail(token);
         return ResponseEntity.ok("이메일 인증이 완료되었습니다!");
     }
+
+    /**
+     * 로그인
+     *
+     * @param email 로그인 이메일
+     * @param password 로그인 암호
+     * @return JWT 토큰  생성
+     */
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestParam String email, @RequestParam String password) {
+        String token = authService.login(email, password);
+        return ResponseEntity.ok(token); // JWT 토큰 반환
+    }
 }
