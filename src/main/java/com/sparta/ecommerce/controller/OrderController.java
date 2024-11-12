@@ -2,6 +2,7 @@ package com.sparta.ecommerce.controller;
 
 import com.sparta.ecommerce.entity.Order;
 import com.sparta.ecommerce.service.OrderService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -68,5 +69,15 @@ public class OrderController {
     @DeleteMapping("/{id}")
     public void deleteOrder(@PathVariable Long id) {
         orderService.deleteOrder(id);
+    }
+
+    /**
+     *
+     * @param id 조회할 주문 ID
+     * @return 조회된 주문 상태
+     */
+    @GetMapping("/{id}/status")
+    public ResponseEntity<Order.OrderStatus> getOrderStatus(@PathVariable Long id) {
+        return ResponseEntity.ok(orderService.getOrderStatus(id));
     }
 }

@@ -25,7 +25,7 @@ public class OrderService {
         this.productRepository = productRepository;
     }
 
-    // 새로운 주문을 생성합니다.
+    // 새로운 주문을 생성
     public Order createOrder(Order order) {
         // 사용자 존재 확인
         if (!userRepository.existsById(order.getUserId())) {
@@ -38,20 +38,25 @@ public class OrderService {
         }
 
         order.setOrderDate(LocalDateTime.now());  // 주문 날짜를 현재 시간으로 설정
+        order.setStatus(Order.OrderStatus.PENDING); // 상태가 기본값 PENDING으로 설정되어 있음
         return orderRepository.save(order);
     }
 
-    // 모든 주문을 조회합니다.
+    // 모든 주문을 조회
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
 
-    // ID로 특정 주문을 조회합니다.
+    // ID로 특정 주문을 조회
     public Optional<Order> getOrderById(Long id) {
+        // 주문이 존재하는지 확인
+        Order existingOrder = orderRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+
         return orderRepository.findById(id);
     }
 
-    // 특정 주문의 정보를 업데이트합니다.
+    // 특정 주문의 정보를 업데이트
     public Order updateOrder(Long id, Order orderDetails) {
         // 주문이 존재하는지 확인
         Order existingOrder = orderRepository.findById(id)
@@ -62,6 +67,7 @@ public class OrderService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
 
+        // 상품이 존재하는지 확인
         if (!productRepository.existsById(orderDetails.getProductId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
         }
@@ -75,12 +81,22 @@ public class OrderService {
         return orderRepository.save(existingOrder);
     }
 
-    // 특정 주문을 삭제합니다.
+    // 특정 주문을 삭제
     public void deleteOrder(Long id) {
         if (orderRepository.existsById(id)) {
             orderRepository.deleteById(id);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
         }
+    }
+
+    // 주문 상태 조회
+    public Order.OrderStatus getOrderStatus(Long orderId) {
+        // 주문 존재 여부 확인
+        Order existingOrder = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+
+        // 주문이 존재하면 상태 반환
+        return existingOrder.getStatus();
     }
 }

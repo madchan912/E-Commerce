@@ -22,12 +22,12 @@ public class UserService {
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
-    // 모든 사용자를 조회합니다.
+    // 모든 사용자를 조회
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    // ID로 특정 사용자를 조회합니다.
+    // ID로 특정 사용자를 조회
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id).map(user -> {
             user.setName(AESUtil.decrypt(user.getName())); // 이름 복호화
@@ -37,7 +37,7 @@ public class UserService {
         });
     }
 
-    // 특정 사용자의 정보를 업데이트합니다.
+    // 특정 사용자의 정보를 업데이트
     public User updateUser(Long id, User userDetails) {
         return userRepository.findById(id).map(user -> {
             user.setName(AESUtil.encrypt(userDetails.getName())); // 이름 암호화
@@ -47,7 +47,7 @@ public class UserService {
         }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
-    // 특정 사용자를 삭제합니다.
+    // 특정 사용자를 삭제
     public void deleteUser(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);

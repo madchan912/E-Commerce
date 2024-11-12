@@ -18,22 +18,22 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    // 새로운 상품을 추가합니다.
+    // 새로운 상품을 추가
     public Product createProduct(Product product) {
         return productRepository.save(product);
     }
 
-    // 모든 상품을 조회합니다.
+    // 모든 상품을 조회
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-    // ID로 특정 상품을 조회합니다.
+    // ID로 특정 상품을 조회
     public Optional<Product> getProductById(Long id) {
         return productRepository.findById(id);
     }
 
-    // 특정 상품의 정보를 업데이트합니다.
+    // 특정 상품의 정보를 업데이트
     public Product updateProduct(Long id, Product productDetails) {
         return productRepository.findById(id)
                 .map(product -> {
@@ -44,7 +44,7 @@ public class ProductService {
                 }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
     }
 
-    // 특정 상품을 삭제합니다.
+    // 특정 상품을 삭제
     public void deleteProduct(Long id) {
         if (productRepository.existsById(id)) {
             productRepository.deleteById(id);
