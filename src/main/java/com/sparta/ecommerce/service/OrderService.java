@@ -1,6 +1,7 @@
 package com.sparta.ecommerce.service;
 
 import com.sparta.ecommerce.entity.Order;
+import com.sparta.ecommerce.entity.Product;
 import com.sparta.ecommerce.repository.OrderRepository;
 import com.sparta.ecommerce.repository.ProductRepository;
 import com.sparta.ecommerce.repository.UserRepository;
@@ -81,15 +82,6 @@ public class OrderService {
         return orderRepository.save(existingOrder);
     }
 
-    // 특정 주문을 삭제
-    public void deleteOrder(Long id) {
-        if (orderRepository.existsById(id)) {
-            orderRepository.deleteById(id);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
-        }
-    }
-
     // 주문 상태 조회
     public Order.OrderStatus getOrderStatus(Long orderId) {
         // 주문 존재 여부 확인
@@ -98,5 +90,21 @@ public class OrderService {
 
         // 주문이 존재하면 상태 반환
         return existingOrder.getStatus();
+    }
+
+    // 주문 취소
+    public void cancelOrder(Long orderId) {
+        // 주문 조회
+        Order existingOrder = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+
+        // 주문 상태가 'SHIPPED'인 경우 취소 불가
+        if (existingOrder.getStatus() != Order.OrderStatus.PENDING) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel an order that has already been shipped.");
+        }
+
+        // 주문 상태를 'CANCELED'로 업데이트
+        existingOrder.setStatus(Order.OrderStatus.CANCELED);
+        orderRepository.save(existingOrder);
     }
 }
