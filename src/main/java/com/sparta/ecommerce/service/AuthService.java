@@ -8,12 +8,14 @@ import com.sparta.ecommerce.repository.VerificationTokenRepository;
 import com.sparta.ecommerce.util.AESUtil;
 import com.sparta.ecommerce.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AuthService {
@@ -32,6 +34,9 @@ public class AuthService {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
     // 회원가입 및 이메일 인증 토큰 생성
     public void signUp(SignUpRequestDto requestDto) {
@@ -107,6 +112,16 @@ public class AuthService {
 
         // 이메일 복호화 하여 JWT 토큰생성
         String decryptedEmail = AESUtil.decrypt(user.getEmail());
-        return jwtUtil.generateToken(decryptedEmail);
+        return "Bearer " + jwtUtil.generateToken(decryptedEmail);
+    }
+
+    // 로그아웃 시 토큰을 블랙리스트에 추가
+    public void logout(String token) {
+        // 토큰의 만료 시간을 가져옵니다.
+        long expiration = jwtUtil.getExpiration(token);
+        String key = "blacklist:" + token;
+
+        // Redis에 토큰을 저장하고, 만료 시간까지 유지
+        redisTemplate.opsForValue().set(key, "logout", expiration, TimeUnit.MILLISECONDS);
     }
 }

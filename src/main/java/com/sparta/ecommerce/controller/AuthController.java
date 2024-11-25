@@ -2,7 +2,11 @@ package com.sparta.ecommerce.controller;
 
 import com.sparta.ecommerce.dto.SignUpRequestDto;
 import com.sparta.ecommerce.service.AuthService;
+import com.sparta.ecommerce.util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +16,9 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     /**
      * 회원가입
@@ -49,4 +56,34 @@ public class AuthController {
         String token = authService.login(email, password);
         return ResponseEntity.ok(token); // JWT 토큰 반환
     }
+
+    /**
+     * 로그아웃
+     *
+     * @param request HTTP 요청 객체
+     * @return 로그아웃 성공 메시지 또는 오류 메시지
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        // JwtUtil을 사용해 토큰을 추출
+        String token = jwtUtil.extractTokenFromRequest(request);
+
+        // 토큰이 없거나 유효하지 않은 경우 401 반환
+        if (token == null || !jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다."); // 401 Unauthorized
+        }
+
+        // 토큰이 이미 블랙리스트에 등록되어 있는 경우
+        if (jwtUtil.isTokenBlacklisted(token)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 블랙리스트에 등록된 토큰입니다.");
+        }
+
+        // 블랙리스트에 추가하여 로그아웃 처리
+        authService.logout(token);
+
+        // 성공 메시지 반환
+        return ResponseEntity.ok("로그아웃 성공!");
+    }
+
+
 }
