@@ -7,6 +7,7 @@ import com.sparta.ecommerce.repository.UserRepository;
 import com.sparta.ecommerce.repository.VerificationTokenRepository;
 import com.sparta.ecommerce.util.AESUtil;
 import com.sparta.ecommerce.util.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,25 +19,15 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private VerificationTokenRepository tokenRepository;
-
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    private EmailService emailService;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private final UserRepository userRepository;
+    private final VerificationTokenRepository tokenRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private final JwtUtil jwtUtil;
+    private final RedisTemplate<String, String> redisTemplate;
 
     // 회원가입 및 이메일 인증 토큰 생성
     public void signUp(SignUpRequestDto requestDto) {

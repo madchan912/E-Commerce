@@ -5,6 +5,7 @@ import com.sparta.ecommerce.entity.Product;
 import com.sparta.ecommerce.repository.OrderRepository;
 import com.sparta.ecommerce.repository.ProductRepository;
 import com.sparta.ecommerce.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,17 +15,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
-
-    public OrderService(OrderRepository orderRepository, UserRepository userRepository, ProductRepository productRepository) {
-        this.orderRepository = orderRepository;
-        this.userRepository = userRepository;
-        this.productRepository = productRepository;
-    }
 
     // 새로운 주문을 생성
     public Order createOrder(Order order) {
