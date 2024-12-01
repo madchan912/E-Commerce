@@ -21,7 +21,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthFilter authFilter) throws Exception {
         http.csrf().disable()
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/*").permitAll()// 인증 없이 접근 가능
+                        .requestMatchers("/auth/**", "/products/**").permitAll()// 인증 없이 접근 가능
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class); // Spring 관리 객체 사용

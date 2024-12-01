@@ -24,6 +24,12 @@ public class AuthFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
         System.out.println("Request URI: " + requestURI);
 
+        // 특정 경로는 필터 로직을 건너뜁니다.
+        if (requestURI.startsWith("/auth") || requestURI.startsWith("/products")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // JwtUtil을 사용해 토큰을 추출
         String token = jwtUtil.extractTokenFromRequest(request);
         System.out.println("Received Token: " + token);
