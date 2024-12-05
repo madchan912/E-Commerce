@@ -1,6 +1,8 @@
 package com.sparta.ecommerce.service;
 
 import com.sparta.ecommerce.entity.Product;
+import com.sparta.ecommerce.entity.ProductDetail;
+import com.sparta.ecommerce.repository.ProductDetailRepository;
 import com.sparta.ecommerce.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
@@ -13,9 +15,11 @@ import java.util.Optional;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductDetailRepository productDetailRepository;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, ProductDetailRepository productDetailRepository) {
         this.productRepository = productRepository;
+        this.productDetailRepository = productDetailRepository;
     }
 
     // 새로운 상품을 추가
@@ -51,5 +55,18 @@ public class ProductService {
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
         }
+    }
+
+    // 상품 ID로 상세 정보 조회
+    public ProductDetail getProductDetail(Long productId) {
+        return productDetailRepository.findByProductId(productId);
+    }
+
+    // 상품과 상세 정보 저장
+    public void saveProductWithDetail(Product product, ProductDetail productDetail) {
+        productDetail.setProduct(product);
+        product.setProductDetail(productDetail);
+
+        productRepository.save(product); // Cascade로 ProductDetail도 저장됨
     }
 }

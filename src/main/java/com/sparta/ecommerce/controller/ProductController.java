@@ -1,6 +1,7 @@
 package com.sparta.ecommerce.controller;
 
 import com.sparta.ecommerce.entity.Product;
+import com.sparta.ecommerce.entity.ProductDetail;
 import com.sparta.ecommerce.service.ProductService;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,11 +21,12 @@ public class ProductController {
      * 상품을 등록합니다.
      *
      * @param product 등록할 상품 정보
-     * @return 등록된 상품
      */
     @PostMapping
-    public Product createProduct(@RequestBody Product product) {
-        return productService.createProduct(product);
+    public void createProduct(@RequestBody Product product) {
+        ProductDetail productDetail = product.getProductDetail();
+        productDetail.setProduct(product);
+        productService.saveProductWithDetail(product, productDetail);
     }
 
     /**
@@ -68,5 +70,16 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
+    }
+
+    /**
+     * 상품 상세 정보 조회
+     *
+     * @param productId 상품 ID
+     * @return 상품 상세 정보
+     */
+    @GetMapping("/{productId}/details")
+    public ProductDetail getProductDetail(@PathVariable Long productId) {
+        return productService.getProductDetail(productId);
     }
 }
