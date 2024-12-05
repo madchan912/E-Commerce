@@ -1,5 +1,6 @@
 package com.sparta.ecommerce.controller;
 
+import com.sparta.ecommerce.dto.LoginRequest;
 import com.sparta.ecommerce.dto.SignUpRequestDto;
 import com.sparta.ecommerce.service.AuthService;
 import com.sparta.ecommerce.util.JwtUtil;
@@ -47,12 +48,16 @@ public class AuthController {
     /**
      * 로그인
      *
-     * @param email 로그인 이메일
-     * @param password 로그인 암호
-     * @return JWT 토큰  생성
+     * @param loginRequest 로그인 요청 데이터 (이메일과 암호 포함)
+     * @return JWT 토큰 생성
      */
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String email, @RequestParam String password) {
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+        // 이메일과 비밀번호를 LoginRequest 객체로 받음
+        String email = loginRequest.getEmail();
+        String password = loginRequest.getPassword();
+
+        // 로그인 처리
         String token = authService.login(email, password);
         return ResponseEntity.ok(token); // JWT 토큰 반환
     }
