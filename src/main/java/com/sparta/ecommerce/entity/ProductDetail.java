@@ -1,5 +1,6 @@
 package com.sparta.ecommerce.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -12,6 +13,7 @@ public class ProductDetail {
 
     @OneToOne
     @JoinColumn(name = "product_id", nullable = false)
+    @JsonBackReference // 직렬화 제외
     private Product product;
 
     private String detailedDescription;
