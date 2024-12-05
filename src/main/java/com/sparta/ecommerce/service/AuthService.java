@@ -28,6 +28,7 @@ public class AuthService {
     private final EmailService emailService;
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, String> redisTemplate;
+    private final TokenService tokenService;
 
     // 회원가입 및 이메일 인증 토큰 생성
     public void signUp(SignUpRequestDto requestDto) {
@@ -103,7 +104,15 @@ public class AuthService {
 
         // 이메일 복호화 하여 JWT 토큰생성
         String decryptedEmail = AESUtil.decrypt(user.getEmail());
-        return "Bearer " + jwtUtil.generateToken(decryptedEmail);
+        String token = jwtUtil.generateToken(decryptedEmail);
+
+        // 사용자 ID를 Redis에 저장
+        String userId = user.getId().toString();
+        long expiration = jwtUtil.getExpiration(token);
+        tokenService.saveUserToken(userId, token, expiration);
+
+        // Bearer 토큰 반환
+        return "Bearer " + token;
     }
 
     // 로그아웃 시 토큰을 블랙리스트에 추가
@@ -114,5 +123,11 @@ public class AuthService {
 
         // Redis에 토큰을 저장하고, 만료 시간까지 유지
         redisTemplate.opsForValue().set(key, "logout", expiration, TimeUnit.MILLISECONDS);
+    }
+
+    // 모든 기기에서 로그아웃 처리
+    public void logoutAllDevices(String userId) {
+        // Redis에서 사용자별 저장된 모든 토큰을 조회
+        tokenService.deleteUserTokens(userId);
     }
 }

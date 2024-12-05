@@ -85,5 +85,15 @@ public class AuthController {
         return ResponseEntity.ok("로그아웃 성공!");
     }
 
-
+    /**
+     * 모든 기기에서 로그아웃
+     *
+     * @param userId 사용자 ID
+     * @return 로그아웃 성공 메시지
+     */
+    @PostMapping("/logout/all")
+    public ResponseEntity<String> logoutAllDevices(@RequestParam String userId) {
+        authService.logoutAllDevices(userId); // 모든 기기에서 로그아웃 처리
+        return ResponseEntity.ok("모든 기기에서 로그아웃되었습니다.");
+    }
 }
