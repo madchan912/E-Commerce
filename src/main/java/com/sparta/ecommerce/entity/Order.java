@@ -21,7 +21,7 @@ public class Order {
     private LocalDateTime orderDate = LocalDateTime.now(); // 주문 시간
 
     @Enumerated(EnumType.STRING)
-    private OrderStatus status = OrderStatus.PENDING; // 주문 상태 기본값
+    private OrderStatus status = OrderStatus.ORDER_PLACED; // 주문 상태 기본값
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference // 직렬화 허용
@@ -29,6 +29,6 @@ public class Order {
     private List<OrderItem> orderItems; // 주문에 포함된 상품들
 
     public enum OrderStatus {
-        PENDING, SHIPPED, DELIVERED, CANCELED, RETURNED
+        ORDER_PLACED, SHIPPING, DELIVERED, CANCELED, RETURNED
     }
 }

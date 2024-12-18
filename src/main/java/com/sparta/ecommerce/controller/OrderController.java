@@ -66,4 +66,27 @@ public class OrderController {
     public List<Order> getOrdersByUserId(@PathVariable Long userId) {
         return orderService.getOrdersByUserId(userId);
     }
+
+    /**
+     * 주문 취소
+     * 
+     * @param orderId   주문 ID
+     * @return  취소된 주문 정보
+     */
+    @PutMapping("/{orderId}/cancel")
+    public Order cancelOrder(@PathVariable Long orderId) {
+        return orderService.cancelOrder(orderId);
+    }
+
+    /**
+     * 주문 반품
+     * 
+     * @param orderId   주문 ID
+     * @return  반품된 주문 정보
+     */
+    @PutMapping("/{orderId}/return")
+    public Order returnOrder(@PathVariable Long orderId) {
+        return orderService.returnOrder(orderId);
+    }
+
 }
