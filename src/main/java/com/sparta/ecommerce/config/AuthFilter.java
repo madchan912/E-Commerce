@@ -6,10 +6,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class AuthFilter extends OncePerRequestFilter {
@@ -41,7 +45,19 @@ public class AuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        System.out.println("Token is valid.");
+        if(token != null && jwtUtil.validateToken(token)){
+            System.out.println("Token is valid.");
+
+            // 토큰에서 사용자 정보 추출
+            String email = jwtUtil.extractEmail(token);
+            System.out.println("Authenticated user: " + email);
+
+            // SecurityContextHolder에 Authentication 설정
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                    email, null, List.of(new SimpleGrantedAuthority("ROLE_USER"))); // ROLE_USER 권한 설정
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+        }
+
         // 다른 유효성 검사 로직 추가
         filterChain.doFilter(request, response);
     }
