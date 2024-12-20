@@ -5,13 +5,7 @@ plugins {
 }
 
 group = 'com.sparta'
-version = '0.0.1-SNAPSHOT'
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}
+version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -20,36 +14,25 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    // Lombok 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // PostgreSQL 의존성 추가
+    // 이메일 서비스 관련
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // JWT 관련
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+
+    // PostgreSQL 드라이버
     implementation 'org.postgresql:postgresql:42.2.5'
 
     // Redis 의존성 추가
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
-    // Spring Security 의존성 추가
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-
-    // Spring Boot Starter Mail 의존성 추가
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
-
-    // JWT 의존성 추가
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
     // jaxb-api 의존성 추가
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
     implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1'
 
     implementation project(':common')
-
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
 }
