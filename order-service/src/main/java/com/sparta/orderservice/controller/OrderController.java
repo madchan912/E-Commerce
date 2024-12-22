@@ -27,8 +27,9 @@ public class OrderController {
     @ResponseStatus(HttpStatus.CREATED)
     public Order createOrder(@RequestParam Long userId,
                              @RequestParam Long productId,
-                             @RequestParam int quantity) {
-        return orderService.createOrder(userId, productId, quantity);
+                             @RequestParam int quantity,
+                             @RequestHeader("Authorization") String token) {
+        return orderService.createOrder(userId, productId, quantity, token);
     }
 
     /**
@@ -39,8 +40,9 @@ public class OrderController {
      */
     @PostMapping("/create-from-wishlist")
     @ResponseStatus(HttpStatus.CREATED)
-    public Order createOrderFromWishlist(@RequestParam Long userId) {
-        return orderService.createOrderFromWishlist(userId);
+    public Order createOrderFromWishlist(@RequestParam Long userId,
+                                         @RequestHeader("Authorization") String token) {
+        return orderService.createOrderFromWishlist(userId, token);
     }
 
     /**

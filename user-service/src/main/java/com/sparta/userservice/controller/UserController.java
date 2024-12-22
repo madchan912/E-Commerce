@@ -1,8 +1,11 @@
 package com.sparta.userservice.controller;
 
+import com.sparta.userservice.dto.UserResponse;
 import com.sparta.userservice.entity.User;
 import com.sparta.userservice.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -33,8 +36,10 @@ public class UserController {
      * @return 조회된 사용자 정보
      */
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userService.getUserById(id).orElse(null);
+    public UserResponse getUserById(@PathVariable Long id) {
+        User user = userService.getUserById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return new UserResponse(user.getId(), user.getName(), user.getEmail());
     }
 
     /**

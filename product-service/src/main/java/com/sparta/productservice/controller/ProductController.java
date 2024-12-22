@@ -1,9 +1,12 @@
 package com.sparta.productservice.controller;
 
+import com.sparta.productservice.dto.ProductResponse;
 import com.sparta.productservice.entity.Product;
 import com.sparta.productservice.entity.ProductDetail;
 import com.sparta.productservice.service.ProductService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -46,8 +49,10 @@ public class ProductController {
      * @return 조회된 상품 정보
      */
     @GetMapping("/{id}")
-    public Product getProductById(@PathVariable Long id) {
-        return productService.getProductById(id).orElse(null);
+    public ProductResponse getProductById(@PathVariable Long id) {
+        Product product = productService.getProductById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+        return new ProductResponse(product.getId(), product.getName(), product.getPrice());
     }
 
     /**

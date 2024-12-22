@@ -38,8 +38,9 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
     implementation project(':common')
-    implementation project(':user-service')
-    implementation project(':product-service')
+
+    // Feign Client 의존성 추가
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 }
 
 dependencyManagement {

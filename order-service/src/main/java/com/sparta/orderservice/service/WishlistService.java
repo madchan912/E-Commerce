@@ -1,7 +1,9 @@
 package com.sparta.orderservice.service;
 
+import com.sparta.orderservice.dto.ProductResponse;
 import com.sparta.orderservice.entity.Wishlist;
 import com.sparta.orderservice.entity.WishlistItem;
+import com.sparta.orderservice.feign.ProductClient;
 import com.sparta.productservice.repository.ProductRepository;
 import com.sparta.orderservice.repository.WishlistItemRepository;
 import com.sparta.orderservice.repository.WishlistRepository;
@@ -20,7 +22,7 @@ public class WishlistService {
 
     private final WishlistRepository wishlistRepository;
     private final WishlistItemRepository wishlistItemRepository;
-    private final ProductRepository productRepository;
+    private final ProductClient productClient;
 
     // 위시리스트에 상품 추가
     public WishlistItem  addToWishlist(Long userId, Long productId, int quantity) {
@@ -42,9 +44,10 @@ public class WishlistService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Product already in wishlist");
         }
 
-        // 상품 존재 여부 확인
-        if (!productRepository.existsById(productId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+        // 상품 확인
+        ProductResponse product = productClient.getProductById(productId);
+        if (product == null) {
+            throw new IllegalArgumentException("Product not found.");
         }
 
         // WishlistItem 생성 및 저장

@@ -1,11 +1,13 @@
 package com.sparta.orderservice.service;
 
+import com.sparta.orderservice.dto.ProductResponse;
+import com.sparta.orderservice.dto.UserResponse;
 import com.sparta.orderservice.entity.Order;
 import com.sparta.orderservice.entity.OrderItem;
 import com.sparta.orderservice.entity.Wishlist;
+import com.sparta.orderservice.feign.ProductClient;
+import com.sparta.orderservice.feign.UserClient;
 import com.sparta.orderservice.repository.OrderRepository;
-import com.sparta.productservice.repository.ProductRepository;
-import com.sparta.userservice.repository.UserRepository;
 import com.sparta.orderservice.repository.WishlistRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,20 +22,24 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final UserRepository userRepository;
-    private final ProductRepository productRepository;
     private final WishlistRepository wishlistRepository;
+    private final UserClient userClient;
+    private final ProductClient productClient;
 
     // 단일 상품 주문 생성
     @Transactional
-    public Order createOrder(Long userId, Long productId, int quantity) {
+    public Order createOrder(Long userId, Long productId, int quantity, String token) {
         // 사용자 확인
-        userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+        UserResponse user = userClient.getUserByIdWithToken(userId, token);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found.");
+        }
 
         // 상품 확인
-        productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found."));
+        ProductResponse product = productClient.getProductById(productId);
+        if (product == null) {
+            throw new IllegalArgumentException("Product not found.");
+        }
 
         // 주문 생성
         Order order = new Order();
@@ -53,10 +59,12 @@ public class OrderService {
 
     // 위시리스트 데이터를 주문으로 변환
     @Transactional
-    public Order createOrderFromWishlist(Long userId) {
+    public Order createOrderFromWishlist(Long userId, String token) {
         // 사용자 확인
-        userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+        UserResponse user = userClient.getUserByIdWithToken(userId, token);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found.");
+        }
 
         // 위시리스트 조회
         Wishlist wishlist = wishlistRepository.findByUserId(userId);
@@ -71,8 +79,10 @@ public class OrderService {
         // 위시리스트 아이템을 OrderItem으로 변환
         List<OrderItem> orderItems = wishlist.getItems().stream()
                 .map(item -> {
-                    productRepository.findById(item.getProductId())
-                            .orElseThrow(() -> new IllegalArgumentException("Product not found."));
+                    ProductResponse product = productClient.getProductById(item.getProductId());
+                    if (product == null) {
+                        throw new IllegalArgumentException("Product not found.");
+                    }
                     OrderItem orderItem = new OrderItem();
                     orderItem.setOrder(order);
                     orderItem.setProductId(item.getProductId());
