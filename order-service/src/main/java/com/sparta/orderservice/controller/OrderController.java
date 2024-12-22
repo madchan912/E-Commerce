@@ -70,7 +70,7 @@ public class OrderController {
 
     /**
      * 주문 취소
-     * 
+     *
      * @param orderId   주문 ID
      * @return  취소된 주문 정보
      */
@@ -81,7 +81,7 @@ public class OrderController {
 
     /**
      * 주문 반품
-     * 
+     *
      * @param orderId   주문 ID
      * @return  반품된 주문 정보
      */
@@ -89,5 +89,4 @@ public class OrderController {
     public Order returnOrder(@PathVariable Long orderId) {
         return orderService.returnOrder(orderId);
     }
-
 }

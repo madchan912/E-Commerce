@@ -32,7 +32,6 @@ public class UserService {
         return userRepository.findById(id).map(user -> {
             user.setName(AESUtil.decrypt(user.getName())); // 이름 복호화
             user.setEmail(AESUtil.decrypt(user.getEmail())); // 이메일 복호화
-            // 비밀번호는 복호화하지 않음 (단방향 해시)
             return user;
         });
     }

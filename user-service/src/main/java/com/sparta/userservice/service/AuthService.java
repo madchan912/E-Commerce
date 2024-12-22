@@ -82,52 +82,39 @@ public class AuthService {
 
     // 로그인 기능 추가
     public String login(String email, String password) {
-        // 이메일을 암호화한 후 데이터베이스에서 조회
         Optional<User> userOptional = userRepository.findByEmail(AESUtil.encrypt(email));
-        
-        // 사용자 존재 여부
         if (userOptional.isEmpty()) {
             throw new RuntimeException("Invalid email or password");
         }
-        
+
         User user = userOptional.get();
-        
-        // 암호 일치 여부
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Invalid email or password");
         }
 
-        // 이메일 인증 여부
         if (!user.isVerified()) {
             throw new RuntimeException("Email not verified");
         }
 
-        // 이메일 복호화 하여 JWT 토큰생성
         String decryptedEmail = AESUtil.decrypt(user.getEmail());
         String token = jwtUtil.generateToken(decryptedEmail);
 
-        // 사용자 ID를 Redis에 저장
         String userId = user.getId().toString();
         long expiration = jwtUtil.getExpiration(token);
         tokenService.saveUserToken(userId, token, expiration);
 
-        // Bearer 토큰 반환
         return "Bearer " + token;
     }
 
-    // 로그아웃 시 토큰을 블랙리스트에 추가
+    // 로그아웃
     public void logout(String token) {
-        // 토큰의 만료 시간을 가져옵니다.
         long expiration = jwtUtil.getExpiration(token);
         String key = "blacklist:" + token;
-
-        // Redis에 토큰을 저장하고, 만료 시간까지 유지
         redisTemplate.opsForValue().set(key, "logout", expiration, TimeUnit.MILLISECONDS);
     }
 
-    // 모든 기기에서 로그아웃 처리
+    // 모든 기기에서 로그아웃
     public void logoutAllDevices(String userId) {
-        // Redis에서 사용자별 저장된 모든 토큰을 조회
         tokenService.deleteUserTokens(userId);
     }
 }

@@ -56,6 +56,17 @@ public class ProductController {
     }
 
     /**
+     * 특정 상품의 상세 정보를 조회합니다.
+     *
+     * @param productId 상품 ID
+     * @return 상품 상세 정보
+     */
+    @GetMapping("/{productId}/details")
+    public ProductDetail getProductDetail(@PathVariable Long productId) {
+        return productService.getProductDetail(productId);
+    }
+
+    /**
      * 특정 상품의 정보를 업데이트합니다.
      *
      * @param id 업데이트할 상품의 ID
@@ -75,16 +86,5 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
-    }
-
-    /**
-     * 상품 상세 정보 조회
-     *
-     * @param productId 상품 ID
-     * @return 상품 상세 정보
-     */
-    @GetMapping("/{productId}/details")
-    public ProductDetail getProductDetail(@PathVariable Long productId) {
-        return productService.getProductDetail(productId);
     }
 }
