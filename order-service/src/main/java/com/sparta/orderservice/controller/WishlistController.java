@@ -35,8 +35,9 @@ public class WishlistController {
     @PostMapping("/{userId}/{productId}")
     public WishlistItem addToWishlist(@PathVariable Long userId,
                                       @PathVariable Long productId,
-                                      @RequestParam int quantity) {
-        return wishlistService.addToWishlist(userId, productId, quantity);
+                                      @RequestParam int quantity,
+                                      @RequestHeader("Authorization") String token) {
+        return wishlistService.addToWishlist(userId, productId, quantity, token);
     }
 
     /**

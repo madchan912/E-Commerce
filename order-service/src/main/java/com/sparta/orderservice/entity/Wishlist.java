@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,5 +19,5 @@ public class Wishlist {
     @OneToMany(mappedBy = "wishlist", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference // 직렬화 허용
     @ToString.Exclude // 무한 루프 방지
-    private List<WishlistItem> items; // 위시리스트 아이템 목록
+    private List<WishlistItem> items = new ArrayList<>(); // 빈 리스트로 초기화
 }
