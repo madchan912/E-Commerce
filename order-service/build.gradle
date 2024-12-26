@@ -41,6 +41,9 @@ dependencies {
 
     // Feign Client 의존성 추가
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    // Resilience4j 의존성 추가
+    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.0.2'
 }
 
 dependencyManagement {

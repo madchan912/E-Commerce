@@ -9,23 +9,40 @@ import com.sparta.orderservice.feign.ProductClient;
 import com.sparta.orderservice.feign.UserClient;
 import com.sparta.orderservice.repository.OrderRepository;
 import com.sparta.orderservice.repository.WishlistRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// OrderService: 주문 관련 비즈니스 로직 제공
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
     private final WishlistRepository wishlistRepository;
     private final UserClient userClient;
     private final ProductClient productClient;
+
+    /*
+    * Resilience4j 관련 설정으로 주석처리
+    @CircuitBreaker(name = "productClient", fallbackMethod = "fallbackGetProduct")
+    @Retry(name = "productClient")
+    public ProductResponse getProduct(Long productId) {
+        return productClient.getProductByIdWithError(productId);
+    }
+
+    private ProductResponse fallbackGetProduct(Long productId, Throwable throwable) {
+        log.error("Fallback triggered for getProduct. Reason: {}", throwable.getMessage());
+        return new ProductResponse(productId, "Unavailable", 0.0); // 기본값 반환
+    }
+     */
 
     // 단일 상품 주문 생성
     @Transactional
