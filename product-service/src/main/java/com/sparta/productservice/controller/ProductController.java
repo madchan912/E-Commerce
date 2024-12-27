@@ -50,8 +50,7 @@ public class ProductController {
      */
     @GetMapping("/{id}")
     public ProductResponse getProductById(@PathVariable Long id) {
-        Product product = productService.getProductById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+        Product product = productService.getProductById(id);
         return new ProductResponse(product.getId(), product.getName(), product.getPrice());
     }
 

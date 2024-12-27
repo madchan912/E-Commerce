@@ -28,33 +28,35 @@ public class ProductService {
     }
 
     // ID로 특정 상품을 조회
-    public Optional<Product> getProductById(Long id) {
-        return productRepository.findById(id);
+    public Product getProductById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
     }
+
 
     // 특정 상품의 정보를 업데이트
     public Product updateProduct(Long id, Product productDetails) {
-        return productRepository.findById(id)
-                .map(product -> {
-                    product.setName(productDetails.getName());
-                    product.setPrice(productDetails.getPrice());
-                    product.setDescription(productDetails.getDescription());
-                    return productRepository.save(product);
-                }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+
+        product.setName(productDetails.getName());
+        product.setPrice(productDetails.getPrice());
+        product.setDescription(productDetails.getDescription());
+
+        return productRepository.save(product);
     }
 
     // 특정 상품을 삭제
     public void deleteProduct(Long id) {
-        if (productRepository.existsById(id)) {
-            productRepository.deleteById(id);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
-        }
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+        productRepository.delete(product);
     }
 
     // 상품 ID로 상세 정보 조회
     public ProductDetail getProductDetail(Long productId) {
-        return productDetailRepository.findByProductId(productId);
+        return productDetailRepository.findByProductId(productId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product detail not found"));
     }
 
     // 상품과 상세 정보 저장
