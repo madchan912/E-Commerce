@@ -4,9 +4,7 @@ import com.sparta.productservice.dto.ProductResponse;
 import com.sparta.productservice.entity.Product;
 import com.sparta.productservice.entity.ProductDetail;
 import com.sparta.productservice.service.ProductService;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 

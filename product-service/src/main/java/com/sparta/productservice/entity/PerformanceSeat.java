@@ -12,11 +12,6 @@ public class PerformanceSeat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "performance_id", nullable = false)
-    @JsonBackReference // 직렬화 제외
-    private Performance performance; // 공연 참조
-
     private String seatCode; // 좌석 코드 (예: A1, B2)
 
     @Enumerated(EnumType.STRING)
@@ -25,4 +20,10 @@ public class PerformanceSeat {
     public enum SeatStatus {
         AVAILABLE, SOLD, RESERVED
     }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "performance_id", nullable = false)
+    @JsonBackReference // 직렬화 제외
+    private Performance performance; // 공연 참조
+
 }

@@ -29,7 +29,7 @@ public class AuthFilter extends OncePerRequestFilter {
         System.out.println("Request URI: " + requestURI);
 
         // 특정 경로는 필터 로직을 건너뜁니다.
-        if (requestURI.startsWith("/auth") || requestURI.startsWith("/products")) {
+        if (requestURI.startsWith("/auth") || requestURI.startsWith("/products") || requestURI.startsWith("/performances")) {
             filterChain.doFilter(request, response);
             return;
         }
