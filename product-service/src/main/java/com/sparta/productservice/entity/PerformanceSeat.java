@@ -1,12 +1,14 @@
 package com.sparta.productservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Table(name = "performance_seat")
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class PerformanceSeat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
