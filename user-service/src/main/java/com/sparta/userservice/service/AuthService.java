@@ -8,10 +8,9 @@ import com.sparta.userservice.entity.VerificationToken;
 import com.sparta.userservice.repository.UserRepository;
 import com.sparta.userservice.repository.VerificationTokenRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -27,7 +26,7 @@ public class AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final JwtUtil jwtUtil;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final StringRedisTemplate redisTemplate;
     private final TokenService tokenService;
 
     // 회원가입 및 이메일 인증 토큰 생성

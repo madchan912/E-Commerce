@@ -18,4 +18,7 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     @Query("SELECT p FROM Performance p WHERE p.date BETWEEN :start AND :end AND p.name LIKE %:name%")
     List<Performance> findByNameContainingAndDateBetweenWithoutSeats(String name, LocalDateTime start, LocalDateTime end);
 
+    // 티켓 오픈 시간이 특정 시간 범위에 있는 공연 조회
+    @Query("SELECT p FROM Performance p WHERE p.ticketOpeningTime BETWEEN :start AND :end")
+    List<Performance> findByTicketOpeningTimeBetween(LocalDateTime start, LocalDateTime end);
 }

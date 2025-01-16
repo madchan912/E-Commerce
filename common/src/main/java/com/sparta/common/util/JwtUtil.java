@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ public class JwtUtil {
     private long expirationTime;
 
     @Autowired
+    @Qualifier("jwtRedisTemplate")
     private RedisTemplate<String, String> redisTemplate;
 
     // 토큰 생성

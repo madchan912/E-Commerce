@@ -19,6 +19,8 @@ public class Performance {
     private LocalDateTime date; // 공연 날짜
 
     private String location; // 공연 장소
+    
+    private LocalDateTime ticketOpeningTime; // 티켓 오픈 일정
 
     @OneToMany(mappedBy = "performance", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference //직렬화 허용
