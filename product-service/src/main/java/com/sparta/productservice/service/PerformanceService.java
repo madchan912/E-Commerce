@@ -59,4 +59,11 @@ public class PerformanceService {
         // 좌석을 데이터베이스에 저장
         return performanceSeatRepository.saveAll(seats);
     }
+
+    // 예약 가능 좌석 조회
+    public int getAvailableSeatCount(Long performanceId) {
+        return performanceSeatRepository.countByPerformanceIdAndStatus(
+                performanceId, PerformanceSeat.SeatStatus.AVAILABLE);
+    }
+
 }

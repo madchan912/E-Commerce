@@ -63,4 +63,16 @@ public class PerformanceController {
                                                            @RequestParam int seatCount) {
         return performanceService.createSeatsForPerformance(performanceId, zone, seatCount);
     }
+
+    /**
+     * 공연의 남은 좌석 조회
+     *
+     * @param performanceId 공연 ID
+     * @return 예약 가능한 좌석 목록
+     */
+    @GetMapping("/{performanceId}/available-seats/count")
+    public int getAvailableSeatCount(@PathVariable Long performanceId) {
+        return performanceService.getAvailableSeatCount(performanceId);
+    }
+
 }
