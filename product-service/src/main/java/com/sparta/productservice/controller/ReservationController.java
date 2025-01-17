@@ -20,16 +20,19 @@ public class ReservationController {
      * 예약 생성
      * 
      * @param userId    사용자 ID
+     * @param performanceId 공연 ID
      * @param seatId    공연 좌석 ID
      * @return  예약 공연 정보
      */
     @PostMapping
     public ResponseEntity<Reservation> createReservation(
             @RequestParam Long userId,
+            @RequestParam Long performanceId,
             @RequestParam Long seatId) {
-        Reservation reservation = reservationService.createReservation(userId, seatId);
+        Reservation reservation = reservationService.createReservation(userId, performanceId, seatId);
         return new ResponseEntity<>(reservation, HttpStatus.CREATED);
     }
+
 
     /**
      * 사용자의 예약 목록 조회

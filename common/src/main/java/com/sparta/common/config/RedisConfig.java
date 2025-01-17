@@ -10,19 +10,17 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
 
-    // JWT 전용 RedisTemplate
-    @Bean(name = "jwtRedisTemplate")
-    public RedisTemplate<String, String> jwtRedisTemplate(RedisConnectionFactory connectionFactory) {
+    @Bean(name = "customStringRedisTemplate")
+    public RedisTemplate<String, String> customStringRedisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new StringRedisSerializer()); // JWT는 String 직렬화 사용
+        template.setValueSerializer(new StringRedisSerializer());
         return template;
     }
 
-    // 좌석 데이터 전용 RedisTemplate
-    @Bean(name = "seatRedisTemplate")
-    public RedisTemplate<String, Object> seatRedisTemplate(RedisConnectionFactory connectionFactory) {
+    @Bean(name = "jsonRedisTemplate")
+    public RedisTemplate<String, Object> jsonRedisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());

@@ -22,7 +22,7 @@ public class JwtUtil {
     private long expirationTime;
 
     @Autowired
-    @Qualifier("jwtRedisTemplate")
+    @Qualifier("customStringRedisTemplate")
     private RedisTemplate<String, String> redisTemplate;
 
     // 토큰 생성

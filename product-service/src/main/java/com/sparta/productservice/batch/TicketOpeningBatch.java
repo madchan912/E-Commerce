@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class TicketOpeningBatch {
@@ -19,13 +20,13 @@ public class TicketOpeningBatch {
     private PerformanceRepository performanceRepository;
 
     @Autowired
-    @Qualifier("seatRedisTemplate")
+    @Qualifier("jsonRedisTemplate")
     private RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 10분마다 실행되며, 티켓 오픈 시간이 다가온 공연의 좌석 데이터를 Redis에 캐싱
      */
-    @Scheduled(fixedRate = 600000) // 10분마다 실행
+    //@Scheduled(fixedRate = 600000) // 10분마다 실행
     public void cacheUpcomingPerformances() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime upcomingWindow = now.plusMinutes(15); // 15분 이내 티켓 오픈 공연
@@ -35,14 +36,25 @@ public class TicketOpeningBatch {
 
         performances.forEach(performance -> {
             String redisKey = "performance:" + performance.getId() + ":seats";
-            redisTemplate.opsForValue().set(redisKey, performance.getSeats()); // 좌석 데이터를 Redis에 캐싱
-            redisTemplate.expireAt(redisKey, java.sql.Timestamp.valueOf(performance.getDate())); // 공연 시간까지 데이터 유지
+
+            // Redis Hash에 각 좌석 데이터를 저장
+            performance.getSeats().forEach(seat -> {
+                redisTemplate.opsForHash().put(redisKey, String.valueOf(seat.getId()), Map.of(
+                        "id", seat.getId(),
+                        "seatCode", seat.getSeatCode(),
+                        "status", seat.getStatus().name() // Enum은 String으로 변환
+                ));
+            });
+
+            // Redis Key의 TTL 설정 (공연 종료 시간 기준)
+            redisTemplate.expireAt(redisKey, java.sql.Timestamp.valueOf(performance.getDate()));
             System.out.println("Cached seats for performance: " + performance.getName());
         });
     }
 
+
     /**
-     * 모든 공연의 좌석 데이터를 Redis에 캐싱
+     * 모든 공연의 좌석 데이터를 Redis에 캐싱(테스트용)
      */
     @Transactional
     public void cacheAllPerformances() {
@@ -52,13 +64,24 @@ public class TicketOpeningBatch {
             // Lazy 로딩된 필드 강제 초기화
             performance.getSeats().size();
 
-            // Redis에 데이터 저장
+            // Redis Key 생성
             String redisKey = "performance:" + performance.getId() + ":seats";
-            redisTemplate.opsForValue().set(redisKey, performance.getSeats());
-            redisTemplate.expireAt(redisKey, java.sql.Timestamp.valueOf(performance.getDate()));
 
+            // Redis Hash에 좌석 데이터 저장
+            performance.getSeats().forEach(seat -> {
+                redisTemplate.opsForHash().put(redisKey, String.valueOf(seat.getId()), Map.of(
+                        "id", seat.getId(),
+                        "seatCode", seat.getSeatCode(),
+                        "status", seat.getStatus().name() // Enum을 String으로 변환
+                ));
+            });
+
+            // Redis Key의 TTL 설정 (공연 종료 시간 기준)
+            redisTemplate.expireAt(redisKey, java.sql.Timestamp.valueOf(performance.getDate()));
+            System.out.println("Cached seats for date: " + performance.getDate());
             System.out.println("Cached seats for performance: " + performance.getName());
         });
     }
+
 
 }
