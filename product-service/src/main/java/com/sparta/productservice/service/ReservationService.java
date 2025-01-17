@@ -52,8 +52,11 @@ public class ReservationService {
         Reservation reservation = new Reservation();
         reservation.setUserId(userId);
         reservation.setSeat(seat);
+        reservation.setPerformance(seat.getPerformance());
         reservation.setReservationTime(LocalDateTime.now());
         reservation.setStatus(Reservation.Status.CONFIRMED);
+        reservationRepository.save(reservation);
+
 
         return reservationRepository.save(reservation);
     }
@@ -86,11 +89,5 @@ public class ReservationService {
         // Redis 상태 삭제
         String redisKey = "seat:" + seat.getId() + ":status";
         redisTemplate.delete(redisKey); // 예약 취소 시 Redis에서 상태 삭제
-    }
-
-    // 예약 상태 조회
-    public Reservation getReservationById(Long reservationId) {
-        return reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
     }
 }

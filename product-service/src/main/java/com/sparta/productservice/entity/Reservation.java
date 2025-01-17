@@ -21,6 +21,10 @@ public class Reservation {
     @JsonManagedReference  // 직렬화 제외
     private PerformanceSeat seat; // 공연 좌석과 다대일 관계
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "performance_id", nullable = false) // 공연 ID 추가
+    private Performance performance; // 공연 정보
+
     private LocalDateTime reservationTime; // 예약 시간
 
     @Enumerated(EnumType.STRING)
