@@ -1,5 +1,6 @@
 package com.sparta.productservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -23,6 +24,7 @@ public class Reservation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "performance_id", nullable = false) // 공연 ID 추가
+    @JsonIgnore
     private Performance performance; // 공연 정보
 
     private LocalDateTime reservationTime; // 예약 시간

@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -43,11 +42,15 @@ public class ReservationService {
         seatData.put("status", "RESERVED");
         redisTemplate.opsForHash().put(redisKey, String.valueOf(seatId), seatData);
 
+        System.out.println("RESERVED redis");
+
         PerformanceSeat seat = performanceSeatRepository.findById(seatId)
                 .orElseThrow(() -> new IllegalArgumentException("Seat not found in PostgreSQL"));
 
         seat.setStatus(PerformanceSeat.SeatStatus.RESERVED);
         performanceSeatRepository.save(seat);
+
+        System.out.println("RESERVED seat");
 
         Reservation reservation = new Reservation();
         reservation.setUserId(userId);
@@ -57,11 +60,10 @@ public class ReservationService {
         reservation.setStatus(Reservation.Status.CONFIRMED);
         reservationRepository.save(reservation);
 
+        System.out.println("RESERVED reservation");
 
         return reservationRepository.save(reservation);
     }
-
-
 
     // 특정 사용자 예약 조회
     public List<Reservation> getReservationsByUser(Long userId) {
@@ -81,13 +83,16 @@ public class ReservationService {
         reservation.setStatus(Reservation.Status.CANCELLED);
         reservationRepository.save(reservation);
 
-        // 좌석 상태 복구
         PerformanceSeat seat = reservation.getSeat();
         seat.setStatus(PerformanceSeat.SeatStatus.AVAILABLE);
         performanceSeatRepository.save(seat);
 
-        // Redis 상태 삭제
-        String redisKey = "seat:" + seat.getId() + ":status";
-        redisTemplate.delete(redisKey); // 예약 취소 시 Redis에서 상태 삭제
+        String redisKey = "performance:" + seat.getPerformance().getId() + ":seats";
+        Map<String, Object> seatData = (Map<String, Object>) redisTemplate.opsForHash().get(redisKey, String.valueOf(seat.getId()));
+
+        if (seatData != null) {
+            seatData.put("status", "AVAILABLE");
+            redisTemplate.opsForHash().put(redisKey, String.valueOf(seat.getId()), seatData);
+        }
     }
 }

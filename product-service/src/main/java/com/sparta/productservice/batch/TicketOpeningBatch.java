@@ -1,5 +1,6 @@
 package com.sparta.productservice.batch;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.productservice.entity.Performance;
 import com.sparta.productservice.repository.PerformanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class TicketOpeningBatch {
     /**
      * 10분마다 실행되며, 티켓 오픈 시간이 다가온 공연의 좌석 데이터를 Redis에 캐싱
      */
-    //@Scheduled(fixedRate = 600000) // 10분마다 실행
+    @Scheduled(fixedRate = 600000) // 10분마다 실행
     public void cacheUpcomingPerformances() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime upcomingWindow = now.plusMinutes(15); // 15분 이내 티켓 오픈 공연
@@ -51,7 +52,6 @@ public class TicketOpeningBatch {
             System.out.println("Cached seats for performance: " + performance.getName());
         });
     }
-
 
     /**
      * 모든 공연의 좌석 데이터를 Redis에 캐싱(테스트용)
@@ -78,10 +78,10 @@ public class TicketOpeningBatch {
 
             // Redis Key의 TTL 설정 (공연 종료 시간 기준)
             redisTemplate.expireAt(redisKey, java.sql.Timestamp.valueOf(performance.getDate()));
-            System.out.println("Cached seats for date: " + performance.getDate());
             System.out.println("Cached seats for performance: " + performance.getName());
+            System.out.println(redisTemplate.getValueSerializer().getClass().getName());
+
         });
     }
-
 
 }
