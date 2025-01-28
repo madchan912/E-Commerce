@@ -33,6 +33,6 @@ public class Reservation {
     private Status status = Status.PENDING; // 예약 상태 기본값
 
     public enum Status {
-        PENDING, CONFIRMED, CANCELLED, FAILED
+        PENDING, CONFIRMED, CANCELLED, FAILED, COMPLETED
     }
 }

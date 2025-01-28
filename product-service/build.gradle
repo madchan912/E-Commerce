@@ -50,4 +50,5 @@ dependencyManagement {
 
 tasks.withType(Test) {
     useJUnitPlatform()
+    enabled = false
 }

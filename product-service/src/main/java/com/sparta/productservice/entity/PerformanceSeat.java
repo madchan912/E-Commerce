@@ -20,7 +20,7 @@ public class PerformanceSeat {
     private SeatStatus status = SeatStatus.AVAILABLE; // 좌석 상태 (기본: AVAILABLE)
 
     public enum SeatStatus {
-        AVAILABLE, SOLD, RESERVED
+        AVAILABLE, SOLD, RESERVED, ON_HOLD
     }
 
     @ManyToOne(fetch = FetchType.LAZY)

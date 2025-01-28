@@ -12,7 +12,7 @@ public class TicketOpeningBatchTest {
 
     @Test
     public void testCacheAllPerformances() {
-        ticketOpeningBatch.cacheAllPerformances();
+        ticketOpeningBatch.cachePerformance(1L);
         System.out.println("Forced batch execution for all performances!");
     }
 }
