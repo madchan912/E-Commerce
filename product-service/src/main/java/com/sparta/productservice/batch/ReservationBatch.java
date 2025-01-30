@@ -36,7 +36,8 @@ public class ReservationBatch {
     /**
      * 10분마다 실행되며, 30분 이상 지난 RESERVED 좌석을 ON_HOLD로 변경
      */
-    @Scheduled(cron = "0 0/10 * * * ?") // 24시간 내내 10분 간격으로 실행    @Transactional
+    //@Scheduled(cron = "0 0/10 * * * ?") // 24시간 내내 10분 간격으로 실행
+    @Transactional
     public void processExpiredReservations() {
         LocalDateTime threshold = LocalDateTime.now().minusMinutes(30);
         List<PerformanceSeat> reservedSeats = performanceSeatRepository.findSeatsByStatusAndTime(
@@ -48,17 +49,19 @@ public class ReservationBatch {
             seat.setStatus(SeatStatus.ON_HOLD);
             performanceSeatRepository.save(seat);
 
-            // 예약 상태를 FAILED로 변경
-            reservationRepository.updateStatusBySeatId(seat.getId(), Status.PENDING, Status.FAILED);
+            System.out.println("Marked seat ID " + seat.getId() + " as updated performanceSeat to ON_HOLD ");
 
-            System.out.println("Marked seat ID " + seat.getId() + " as ON_HOLD and updated reservation to FAILED.");
+            // 예약 상태를 FAILED로 변경
+            reservationRepository.updateStatusBySeatId(seat.getId(), Status.CONFIRMED, Status.FAILED);
+
+            System.out.println("Marked seat ID " + seat.getId() + " as updated reservation to FAILED.");
         });
     }
 
     /**
      * 10분마다 실행되며, "티켓 오픈 시간 + 1시간" 조건을 만족하는 좌석을 복구
      */
-    @Scheduled(cron = "0 0/10 * * * ?") // 24시간 내내 10분 간격으로 실행
+    //@Scheduled(cron = "0 0/10 * * * ?") // 24시간 내내 10분 간격으로 실행
     @Transactional
     public void restoreSeatsFromOnHold() {
         LocalDateTime now = LocalDateTime.now();
@@ -107,4 +110,5 @@ public class ReservationBatch {
             }
         });
     }
+
 }

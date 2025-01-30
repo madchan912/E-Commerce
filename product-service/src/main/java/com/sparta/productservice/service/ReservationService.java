@@ -4,7 +4,7 @@ import com.sparta.productservice.entity.PerformanceSeat;
 import com.sparta.productservice.entity.Reservation;
 import com.sparta.productservice.repository.PerformanceSeatRepository;
 import com.sparta.productservice.repository.ReservationRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,39 +15,50 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final PerformanceSeatRepository performanceSeatRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
+    public ReservationService(
+            ReservationRepository reservationRepository,
+            PerformanceSeatRepository performanceSeatRepository,
+            @Qualifier("jsonRedisTemplate") RedisTemplate<String, Object> redisTemplate
+    ) {
+        this.reservationRepository = reservationRepository;
+        this.performanceSeatRepository = performanceSeatRepository;
+        this.redisTemplate = redisTemplate;
+    }
+
     // 예약 생성
     @Transactional
     public Reservation createReservation(Long userId, Long performanceId, Long seatId) {
         String redisKey = "performance:" + performanceId + ":seats";
-        Map<String, Object> seatData = (Map<String, Object>) redisTemplate.opsForHash().get(redisKey, String.valueOf(seatId));
+        Object rawData = redisTemplate.opsForHash().get(redisKey, String.valueOf(seatId));
 
-        if (seatData == null) {
-            throw new IllegalStateException("Seat data not found.");
+        if (!(rawData instanceof Map<?, ?>)) {
+            throw new IllegalStateException("Unexpected data format in Redis for seatId: " + seatId);
         }
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> seatData = new HashMap<>((Map<String, Object>) rawData);
 
         String seatStatus = (String) seatData.get("status");
         if ("RESERVED".equals(seatStatus)) {
             throw new IllegalStateException("The seat is already reserved.");
         }
 
-        seatData = new HashMap<>(seatData);
-
         seatData.put("status", "RESERVED");
         redisTemplate.opsForHash().put(redisKey, String.valueOf(seatId), seatData);
-
+        
         System.out.println("RESERVED redis");
 
         PerformanceSeat seat = performanceSeatRepository.findById(seatId)
                 .orElseThrow(() -> new IllegalArgumentException("Seat not found in PostgreSQL"));
 
         seat.setStatus(PerformanceSeat.SeatStatus.RESERVED);
+        seat.setReservationTime(LocalDateTime.now()); // 예약된 시간 저장
         performanceSeatRepository.save(seat);
 
         System.out.println("RESERVED seat");
@@ -62,7 +73,7 @@ public class ReservationService {
 
         System.out.println("RESERVED reservation");
 
-        return reservationRepository.save(reservation);
+        return reservation;
     }
 
     // 특정 사용자 예약 조회
@@ -80,6 +91,7 @@ public class ReservationService {
             throw new IllegalStateException("Reservation is already cancelled.");
         }
 
+        // 예약 상태 변경
         reservation.setStatus(Reservation.Status.CANCELLED);
         reservationRepository.save(reservation);
 
@@ -87,10 +99,13 @@ public class ReservationService {
         seat.setStatus(PerformanceSeat.SeatStatus.AVAILABLE);
         performanceSeatRepository.save(seat);
 
+        // Redis 업데이트
         String redisKey = "performance:" + seat.getPerformance().getId() + ":seats";
-        Map<String, Object> seatData = (Map<String, Object>) redisTemplate.opsForHash().get(redisKey, String.valueOf(seat.getId()));
+        Object rawData = redisTemplate.opsForHash().get(redisKey, String.valueOf(seat.getId()));
 
-        if (seatData != null) {
+        if (rawData instanceof Map<?, ?>) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> seatData = new HashMap<>((Map<String, Object>) rawData);
             seatData.put("status", "AVAILABLE");
             redisTemplate.opsForHash().put(redisKey, String.valueOf(seat.getId()), seatData);
         }

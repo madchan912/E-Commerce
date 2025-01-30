@@ -19,7 +19,7 @@ public interface PerformanceSeatRepository extends JpaRepository<PerformanceSeat
     int countByPerformanceIdAndStatus(Long performanceId, PerformanceSeat.SeatStatus status);
 
     // 특정 상태와 시간 기준으로 좌석 조회
-    @Query("SELECT ps FROM PerformanceSeat ps WHERE ps.status = :status AND ps.performance.ticketOpeningTime <= :threshold")
+    @Query("SELECT ps FROM PerformanceSeat ps WHERE ps.status = :status AND ps.reservationTime <= :threshold")
     List<PerformanceSeat> findSeatsByStatusAndTime(SeatStatus status, LocalDateTime threshold);
 
     @Query("SELECT ps FROM PerformanceSeat ps WHERE ps.status = :status AND ps.performance.id = :performanceId")

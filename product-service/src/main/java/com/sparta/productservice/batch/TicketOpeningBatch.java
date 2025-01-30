@@ -26,14 +26,14 @@ public class TicketOpeningBatch {
     /**
      * 10분마다 실행되며, 티켓 오픈 시간이 다가온 공연의 좌석 데이터를 Redis에 캐싱
      */
-    @Scheduled(cron = "0 0/10 * * * ?") // 24시간 내내 10분 간격으로 실행
+    //@Scheduled(cron = "0 0/10 * * * ?") // 24시간 내내 10분 간격으로 실행
     @Transactional
     public void cacheUpcomingPerformances() {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime upcomingWindow = now.plusMinutes(15); // 15분 이내 티켓 오픈 공연
+        LocalDateTime upcomingWindow = now.minusMinutes(15); // 15분 이내 티켓 오픈 공연
 
         // 티켓 오픈 시간이 15분 이내로 다가온 공연 조회
-        List<Performance> performances = performanceRepository.findByTicketOpeningTimeBetween(now, upcomingWindow);
+        List<Performance> performances = performanceRepository.findByTicketOpeningTimeBetween(upcomingWindow, now);
 
         performances.forEach(performance -> {
             String redisKey = "performance:" + performance.getId() + ":seats";
@@ -75,6 +75,5 @@ public class TicketOpeningBatch {
         redisTemplate.expireAt(redisKey, java.sql.Timestamp.valueOf(performance.getDate()));
         System.out.println("Cached seats for performance: " + performance.getName());
     }
-
 
 }

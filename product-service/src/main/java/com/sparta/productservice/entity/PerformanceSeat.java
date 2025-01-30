@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "performance_seat")
 @Data
@@ -22,6 +24,8 @@ public class PerformanceSeat {
     public enum SeatStatus {
         AVAILABLE, SOLD, RESERVED, ON_HOLD
     }
+
+    private LocalDateTime reservationTime; // 예약 시간
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "performance_id", nullable = false)
