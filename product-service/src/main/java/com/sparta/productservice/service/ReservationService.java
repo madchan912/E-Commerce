@@ -49,6 +49,11 @@ public class ReservationService {
             throw new IllegalStateException("The seat is already reserved.");
         }
 
+        Boolean success = redisTemplate.opsForHash().putIfAbsent(redisKey, String.valueOf(seatId), seatData);
+        if (!success) {
+            throw new IllegalStateException("Reservation error: This seat has already been reserved.");
+        }
+
         seatData.put("status", "RESERVED");
         redisTemplate.opsForHash().put(redisKey, String.valueOf(seatId), seatData);
         

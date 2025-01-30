@@ -7,11 +7,13 @@ import com.sparta.productservice.repository.PerformanceSeatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -38,13 +40,7 @@ public class PerformanceService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Performance not found"));
     }
 
-    /**
-     * 공연에 좌석 등록
-     * @param performanceId 공연 ID
-     * @param zone 구역명 (예: A, B 등)
-     * @param seatCount 좌석 수
-     * @return 생성된 좌석 목록
-     */
+    //공연에 좌석 등록
     public List<PerformanceSeat> createSeatsForPerformance(Long performanceId, String zone, int seatCount) {
         Performance performance = getPerformanceById(performanceId);
 
@@ -56,7 +52,6 @@ public class PerformanceService {
             seats.add(seat);
         }
 
-        // 좌석을 데이터베이스에 저장
         return performanceSeatRepository.saveAll(seats);
     }
 
@@ -66,4 +61,19 @@ public class PerformanceService {
                 performanceId, PerformanceSeat.SeatStatus.AVAILABLE);
     }
 
+    // 특정 공연 전체 좌석 현황 조회
+    public ResponseEntity<?> getPerformanceSeats(Long performanceId) {
+        if (Math.random() < 0.2) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied: Please try again.");
+        }
+
+        String redisKey = "performance:" + performanceId + ":seats";
+        Map<Object, Object> seatData = redisTemplate.opsForHash().entries(redisKey);
+
+        if (seatData.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No seat information available for this performance.");
+        }
+
+        return ResponseEntity.ok(seatData);
+    }
 }

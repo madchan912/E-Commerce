@@ -33,7 +33,6 @@ public class ReservationController {
         return new ResponseEntity<>(reservation, HttpStatus.CREATED);
     }
 
-
     /**
      * 사용자의 예약 목록 조회
      *

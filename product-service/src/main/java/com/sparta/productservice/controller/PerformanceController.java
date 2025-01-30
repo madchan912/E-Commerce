@@ -5,6 +5,7 @@ import com.sparta.productservice.entity.PerformanceSeat;
 import com.sparta.productservice.service.PerformanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -75,4 +76,14 @@ public class PerformanceController {
         return performanceService.getAvailableSeatCount(performanceId);
     }
 
+    /**
+     * 특정 공연의 전체 좌석 현황 조회 API
+     *
+     * @param performanceId 공연 ID
+     * @return 좌석 목록 또는 20% 확률로 접근 제한
+     */
+    @GetMapping("/{performanceId}/seats")
+    public ResponseEntity<?> getPerformanceSeats(@PathVariable Long performanceId) {
+        return performanceService.getPerformanceSeats(performanceId);
+    }
 }
