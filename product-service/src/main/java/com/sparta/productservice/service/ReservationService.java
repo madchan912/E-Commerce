@@ -46,27 +46,26 @@ public class ReservationService {
 
         String seatStatus = (String) seatData.get("status");
         if ("RESERVED".equals(seatStatus)) {
-            throw new IllegalStateException("The seat is already reserved.");
-        }
-
-        Boolean success = redisTemplate.opsForHash().putIfAbsent(redisKey, String.valueOf(seatId), seatData);
-        if (!success) {
-            throw new IllegalStateException("Reservation error: This seat has already been reserved.");
+            throw new IllegalStateException("The seat is already reserved. seatId: " + seatId);
         }
 
         seatData.put("status", "RESERVED");
         redisTemplate.opsForHash().put(redisKey, String.valueOf(seatId), seatData);
-        
-        System.out.println("RESERVED redis");
+
+        System.out.println("RESERVED redis: " + seatId);
 
         PerformanceSeat seat = performanceSeatRepository.findById(seatId)
                 .orElseThrow(() -> new IllegalArgumentException("Seat not found in PostgreSQL"));
+
+        if (seat.getStatus() == PerformanceSeat.SeatStatus.RESERVED) {
+            throw new IllegalStateException("The seat is already reserved. seatId: " + seatId);
+        }
 
         seat.setStatus(PerformanceSeat.SeatStatus.RESERVED);
         seat.setReservationTime(LocalDateTime.now()); // 예약된 시간 저장
         performanceSeatRepository.save(seat);
 
-        System.out.println("RESERVED seat");
+        System.out.println("RESERVED seat. seatId: " + seatId);
 
         Reservation reservation = new Reservation();
         reservation.setUserId(userId);
@@ -76,7 +75,7 @@ public class ReservationService {
         reservation.setStatus(Reservation.Status.CONFIRMED);
         reservationRepository.save(reservation);
 
-        System.out.println("RESERVED reservation");
+        System.out.println("ESERVED reservation. seatId: " + seatId);
 
         return reservation;
     }
