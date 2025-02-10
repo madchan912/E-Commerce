@@ -6,15 +6,15 @@ E-Commerce는 Spring Boot 기반의 상품 판매 및 공연 예매 시스템입
 
 ## 프로젝트 구조
 
-###E-Commerce/
-├── common/ # 공통 모듈 (보안, 예외 처리, DTO 등)
-├── user-service/ # 사용자 인증 및 관리 서비스
-├── product-service/ # 상품 및 공연 예매 서비스
-├── order-service/ # 주문 및 결제 서비스
-├── gateway-service/ # API Gateway (Spring Cloud Gateway)
-├── eureka-server/ # Eureka Service Discovery 서버
-├── docker-compose.yml # Docker 컨테이너 설정 파일
-├── settings.gradle # Gradle 프로젝트 설정 파일
+📂 E-Commerce/
+├── 📂 common/ - 공통 모듈 (보안, 예외 처리, DTO 등)
+├── 📂 user-service/ - 사용자 인증 및 관리 서비스
+├── 📂 product-service/ - 상품 및 공연 예매 서비스
+├── 📂 order-service/ - 주문 및 결제 서비스
+├── 📂 gateway-service/ - API Gateway (Spring Cloud Gateway)
+├── 📂 eureka-server/ - Eureka Service Discovery 서버
+├── 📄 docker-compose.yml - Docker 컨테이너 설정 파일
+├── 📄 settings.gradle - Gradle 프로젝트 설정 파일
 
 ## 기술 스택
 
