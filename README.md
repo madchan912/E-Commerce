@@ -5,6 +5,8 @@ E-Commerce는 Spring Boot 기반의 상품 판매 및 공연 예매 시스템입
 사용자는 상품 구매, 선착순 판매, 공연 좌석 예약 등의 기능을 이용할 수 있습니다.
 
 ## 프로젝트 구조
+
+```plaintext
 📂 E-Commerce/
 ├── 📂 common/ - 공통 모듈 (보안, 예외 처리, DTO 등)
 ├── 📂 user-service/ - 사용자 인증 및 관리 서비스
@@ -14,6 +16,7 @@ E-Commerce는 Spring Boot 기반의 상품 판매 및 공연 예매 시스템입
 ├── 📂 eureka-server/ - Eureka Service Discovery 서버
 ├── 📄 docker-compose.yml - Docker 컨테이너 설정 파일
 ├── 📄 settings.gradle - Gradle 프로젝트 설정 파일
+```
 
 ## 기술 스택
 
