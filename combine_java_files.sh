@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # 프로젝트 디렉토리 및 출력 파일 경로 설정
-PROJECT_DIR="/Users/madchan/Project/E-Commerce"
-OUTPUT_FILE="/Users/madchan/Project/E-Commerce/combined_project.txt"
+PROJECT_DIR="/Users/madchan/E-Commerce"
+OUTPUT_FILE="/Users/madchan/E-Commerce/combined_project.txt"
 
 # 기존 출력 파일이 있으면 삭제
 if [ -f "$OUTPUT_FILE" ]; then
