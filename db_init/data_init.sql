@@ -1,3 +1,6 @@
+-- 0. docker db 진입 명령어
+docker exec -it ecommerce_postgres psql -U root -d E-Commerce
+
 -- 1. 공연 데이터 (아이유 콘서트)
 INSERT INTO performance (name, date, location, ticket_opening_time)
 VALUES ('아이유 콘서트', '2026-05-01 19:00:00', '잠실 주경기장', '2026-04-20 10:00:00');
