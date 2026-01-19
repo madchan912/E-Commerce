@@ -10,11 +10,10 @@ import com.sparta.orderservice.feign.UserClient;
 import com.sparta.orderservice.repository.OrderRepository;
 import com.sparta.orderservice.repository.WishlistRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.retry.annotation.Retry;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,19 +29,19 @@ public class OrderService {
     private final UserClient userClient;
     private final ProductClient productClient;
 
-    /*
-    * Resilience4j 관련 설정으로 주석처리
+    // Circuit Breaker 적용 메서드 (주석 해제 및 로직 연결)
     @CircuitBreaker(name = "productClient", fallbackMethod = "fallbackGetProduct")
-    @Retry(name = "productClient")
-    public ProductResponse getProduct(Long productId) {
-        return productClient.getProductByIdWithError(productId);
+    public ProductResponse getProduct(Long productId){
+        //Feign Client 직접 호출
+        return  productClient.getProductById(productId);
     }
 
-    private ProductResponse fallbackGetProduct(Long productId, Throwable throwable) {
-        log.error("Fallback triggered for getProduct. Reason: {}", throwable.getMessage());
-        return new ProductResponse(productId, "Unavailable", 0.0); // 기본값 반환
+    //Fallback 메서드: 장애 발생 시 실행
+    public ProductResponse fallbackGetProduct(Long productId, Throwable t) {
+        log.error("Circuit Breaker triggered for productId: {}. Reason: {}", productId, t.getMessage());
+        // null을 반환하면 createOrder의 null 체크 로직에서 걸러짐
+        return null;
     }
-     */
 
     // 단일 상품 주문 생성
     @Transactional
@@ -52,14 +51,18 @@ public class OrderService {
             throw new IllegalArgumentException("User not found.");
         }
 
-        ProductResponse product = productClient.getProductById(productId);
-        if (product == null) {
-            throw new IllegalArgumentException("Product not found.");
+        // productClient 직접 호출 -> 내부 getProduct(서킷 적용됨) 호출로 변경
+        ProductResponse product = getProduct(productId);
+
+        if  (product == null) {
+            // 서킷 브레이커가 null을 리턴하면 여기서 걸림
+            throw new IllegalArgumentException("Product service is unavailable or product not found.");
         }
 
         Order order = new Order();
         order.setUserId(userId);
         order.setOrderDate(LocalDateTime.now());
+        order.setStatus(Order.OrderStatus.ORDER_PLACED);
 
         OrderItem orderItem = new OrderItem();
         orderItem.setOrder(order);
@@ -85,12 +88,15 @@ public class OrderService {
 
         Order order = new Order();
         order.setUserId(userId);
+        order.setOrderDate(LocalDateTime.now());
+        order.setStatus(Order.OrderStatus.ORDER_PLACED);
 
         List<OrderItem> orderItems = wishlist.getItems().stream()
                 .map(item -> {
-                    ProductResponse product = productClient.getProductById(item.getProductId());
+                    // 여기도 서킷 브레이커 적용된 메서드 호출
+                    ProductResponse product = getProduct(item.getProductId());
                     if (product == null) {
-                        throw new IllegalArgumentException("Product not found.");
+                        throw new IllegalArgumentException("Product not found or Service Unavailable.");
                     }
                     OrderItem orderItem = new OrderItem();
                     orderItem.setOrder(order);
@@ -104,12 +110,7 @@ public class OrderService {
         orderRepository.save(order);
 
         wishlist.getItems().clear();
-
-        if (wishlist.getItems().isEmpty()) {
-            wishlistRepository.delete(wishlist);
-        } else {
-            wishlistRepository.save(wishlist);
-        }
+        wishlistRepository.delete(wishlist); // 비었으면 삭제
 
         return order;
     }
@@ -157,4 +158,5 @@ public class OrderService {
         order.setStatus(Order.OrderStatus.RETURNED);
         return orderRepository.save(order);
     }
+
 }
