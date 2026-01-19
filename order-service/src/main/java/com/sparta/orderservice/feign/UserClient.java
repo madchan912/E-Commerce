@@ -1,6 +1,5 @@
 package com.sparta.orderservice.feign;
 
-import com.sparta.common.config.FeignClientConfig;
 import com.sparta.orderservice.dto.UserResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

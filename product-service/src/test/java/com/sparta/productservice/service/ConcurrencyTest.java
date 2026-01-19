@@ -2,7 +2,6 @@ package com.sparta.productservice.service;
 
 import com.sparta.productservice.batch.TicketOpeningBatch;
 import com.sparta.productservice.entity.PerformanceSeat;
-import com.sparta.productservice.repository.PerformanceRepository;
 import com.sparta.productservice.repository.PerformanceSeatRepository;
 import com.sparta.productservice.repository.ReservationRepository;
 import org.junit.jupiter.api.BeforeEach;
