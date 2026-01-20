@@ -42,6 +42,10 @@ dependencies {
     // Eureka 의존성 추가
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
+    // Spring Batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+
     implementation project(':common')
 }
 

@@ -18,13 +18,23 @@ public class Performance {
 
     private String name; // 공연명
 
-    private LocalDateTime date; // 공연 날짜
+    private LocalDateTime date; // 공연 시작 날짜
 
     private String location; // 공연 장소
     
     private LocalDateTime ticketOpeningTime; // 티켓 오픈 일정
 
+    private LocalDateTime endDate; //공연 종료 날짜
+
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.AVAILABLE; // 기본값: 예매 가능
+
     @OneToMany(mappedBy = "performance", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference //직렬화 허용
     private List<PerformanceSeat> seats; // 좌석 목록
+
+    public enum Status {
+        AVAILABLE, // 예매 가능
+        CLOSED     // 종료됨
+    }
 }
