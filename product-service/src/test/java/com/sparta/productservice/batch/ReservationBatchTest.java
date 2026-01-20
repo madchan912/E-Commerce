@@ -1,9 +1,11 @@
 package com.sparta.productservice.batch;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+@Slf4j
 @SpringBootTest
 public class ReservationBatchTest {
     @Autowired
@@ -15,6 +17,6 @@ public class ReservationBatchTest {
         reservationBatch.processExpiredReservations();
         // ON_HOLD 좌석을 AVAILABLE로 변경하는 배치
         reservationBatch.restoreSeatsFromOnHold();
-        System.out.println("ReservationBatch executed successfully.");
+        log.info("ReservationBatch executed successfully.");
     }
 }

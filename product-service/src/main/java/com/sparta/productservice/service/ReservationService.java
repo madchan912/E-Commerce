@@ -53,7 +53,7 @@ public class ReservationService {
             boolean isLocked = lock.tryLock(1, 3, TimeUnit.SECONDS);
 
             if (!isLocked) {
-                System.out.println("Lock acquisition failed. Seat ID: " + seatId + ", User ID: " + userId);
+                log.info("Lock acquisition failed. Seat ID: " + seatId + ", User ID: " + userId);
                 throw new RuntimeException("Failed to acquire lock (Traffic congestion).");
             }
 

@@ -7,6 +7,7 @@ import com.sparta.productservice.entity.Reservation.Status;
 import com.sparta.productservice.repository.PerformanceRepository;
 import com.sparta.productservice.repository.PerformanceSeatRepository;
 import com.sparta.productservice.repository.ReservationRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class ReservationBatch {
 
@@ -48,12 +50,12 @@ public class ReservationBatch {
             seat.setStatus(SeatStatus.ON_HOLD);
             performanceSeatRepository.save(seat);
 
-            System.out.println("Marked seat ID " + seat.getId() + " as updated performanceSeat to ON_HOLD ");
+            log.info("Marked seat ID " + seat.getId() + " as updated performanceSeat to ON_HOLD ");
 
             // 예약 상태를 FAILED로 변경
             reservationRepository.updateStatusBySeatId(seat.getId(), Status.CONFIRMED, Status.FAILED);
 
-            System.out.println("Marked seat ID " + seat.getId() + " as updated reservation to FAILED.");
+            log.info("Marked seat ID " + seat.getId() + " as updated reservation to FAILED.");
         });
     }
 
@@ -102,10 +104,10 @@ public class ReservationBatch {
                     redisTemplate.opsForHash().put(redisKey, seat.getId().toString(), seatData);
                 }
 
-                System.out.println("Restored seat ID " + seat.getId() + " for performance ID " + performance.getId());
+                log.info("Restored seat ID " + seat.getId() + " for performance ID " + performance.getId());
             } catch (Exception ex) {
                 // 간단한 예외 처리 (로그만 출력)
-                System.err.println("Error restoring seat ID " + seat.getId() + ": " + ex.getMessage());
+                log.error("Error restoring seat ID " + seat.getId() + ": " + ex.getMessage());
             }
         });
     }

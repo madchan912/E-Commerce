@@ -4,6 +4,7 @@ import com.sparta.productservice.batch.TicketOpeningBatch;
 import com.sparta.productservice.entity.PerformanceSeat;
 import com.sparta.productservice.repository.PerformanceSeatRepository;
 import com.sparta.productservice.repository.ReservationRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Slf4j
 @SpringBootTest
 public class ConcurrencyTest {
 
@@ -34,7 +36,7 @@ public class ConcurrencyTest {
 
     @BeforeEach
     void setUp() {
-        System.out.println("테스트 환경 초기화 시작");
+        log.info("테스트 환경 초기화 시작");
         // 1. 기존 예약 내역 모두 삭제
         reservationRepository.deleteAll();
 
@@ -46,7 +48,7 @@ public class ConcurrencyTest {
         // 3. 초기화된 DB 상태를 Reids에 통기화
         ticketOpeningBatch.cachePerformance(1L);
 
-        System.out.println("Redis 캐싱 완료");
+        log.info("Redis 캐싱 완료");
     }
 
     @Test
@@ -69,10 +71,10 @@ public class ConcurrencyTest {
                     // 예약 시도 (유저ID, 공연ID=1, 좌석ID=1)
                     reservationService.createReservation(userId, 1L, 1L);
                     successCount.getAndIncrement(); // 예외 안 나면 성공
-                    System.out.println("예약 성공 User ID: " + userId);
+                    log.info("예약 성공 User ID: " + userId);
                 } catch (Exception e) {
                     failCount.getAndIncrement(); // 예외 나면 실패
-                    System.out.println("예약 실패: " + e.getMessage());
+                    log.error("예약 실패: " + e.getMessage());
                 } finally {
                     latch.countDown(); // 카운트 감소
                 }
@@ -83,11 +85,11 @@ public class ConcurrencyTest {
 
         latch.await();
 
-        System.out.println("===============================================");
-        System.out.println("Total Requests: " + numberOfThreads);
-        System.out.println("Success Count : " + successCount.get());
-        System.out.println("Failed Count  : " + failCount.get());
-        System.out.println("===============================================");
+        log.info("===============================================");
+        log.info("Total Requests: " + numberOfThreads);
+        log.info("Success Count : " + successCount.get());
+        log.info("Failed Count  : " + failCount.get());
+        log.info("===============================================");
 
         // [검증]
         // Redisson 분산 락 적용 후에는 무조건 1명만 성공해야 한다.

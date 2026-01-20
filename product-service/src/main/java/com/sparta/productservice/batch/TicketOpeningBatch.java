@@ -2,6 +2,7 @@ package com.sparta.productservice.batch;
 
 import com.sparta.productservice.entity.Performance;
 import com.sparta.productservice.repository.PerformanceRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class TicketOpeningBatch {
 
@@ -48,7 +50,7 @@ public class TicketOpeningBatch {
 
             // Redis Key의 TTL 설정 (공연 종료 시간 기준)
             redisTemplate.expireAt(redisKey, java.sql.Timestamp.valueOf(performance.getDate()));
-            System.out.println("Cached seats for performance: " + performance.getName());
+            log.info("Cached seats for performance: " + performance.getName());
         });
     }
 
@@ -57,7 +59,7 @@ public class TicketOpeningBatch {
      */
     @Transactional
     public void cachePerformance(Long performanceId) {
-        System.out.println("start batch");
+        log.info("start batch");
         Performance performance = performanceRepository.findById(performanceId)
                 .orElseThrow(() -> new IllegalArgumentException("Performance not found with ID: " + performanceId));
 
@@ -72,7 +74,7 @@ public class TicketOpeningBatch {
         });
 
         redisTemplate.expireAt(redisKey, java.sql.Timestamp.valueOf(performance.getDate()));
-        System.out.println("Cached seats for performance: " + performance.getName());
+        log.info("Cached seats for performance: " + performance.getName());
     }
 
 }

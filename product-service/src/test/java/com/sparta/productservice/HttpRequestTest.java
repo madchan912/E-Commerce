@@ -1,5 +1,7 @@
 package com.sparta.productservice;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -8,6 +10,7 @@ import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Slf4j
 public class HttpRequestTest {
     private static final int TOTAL_REQUESTS = 10000; // 총 요청 개수
     private static final String API_URL = "http://localhost:8083/performances/1/seats"; // 좌석 화면 진입 API
@@ -35,12 +38,12 @@ public class HttpRequestTest {
                             }
                         }
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        log.error("IOException: " + e.getMessage());
                     }
                 });
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Invalid token: " + e.getMessage());
         }
 
         executorService.shutdown();
@@ -53,12 +56,12 @@ public class HttpRequestTest {
             writer.write("Total SUCCESS: " + successCount[0] + "\n");
             writer.write("Total FAILED: " + failureCount[0] + "\n");
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error: " + e.getMessage());
         }
 
         // 콘솔에도 출력
-        System.out.println("Total SUCCESS: " + successCount[0]);
-        System.out.println("Total FAILED: " + failureCount[0]);
-        System.out.println("Test completed! Results saved in " + RESULT_FILE);
+        log.info("Total SUCCESS: " + successCount[0]);
+        log.info("Total FAILED: " + failureCount[0]);
+        log.info("Test completed! Results saved in " + RESULT_FILE);
     }
 }

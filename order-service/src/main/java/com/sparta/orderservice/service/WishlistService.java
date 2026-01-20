@@ -9,6 +9,7 @@ import com.sparta.orderservice.feign.UserClient;
 import com.sparta.orderservice.repository.WishlistItemRepository;
 import com.sparta.orderservice.repository.WishlistRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -87,11 +89,11 @@ public class WishlistService {
         WishlistItem wishlistItem = wishlistItemRepository.findById(productId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "WishlistItem not found"));
 
-        System.out.println("Deleting WishlistItem: " + wishlistItem);
+        log.info("Deleting WishlistItem: " + wishlistItem);
 
         wishlistItemRepository.delete(wishlistItem);
 
-        System.out.println("Deleted WishlistItem: " + wishlistItem);
+        log.info("Deleted WishlistItem: " + wishlistItem);
     }
 
     // 위시리스트 상품 수량 변경
