@@ -126,9 +126,7 @@ public class OrderService {
 
     // 특정 사용자 주문 조회
     public List<Order> getOrdersByUserId(Long userId) {
-        return orderRepository.findAll().stream()
-                .filter(order -> order.getUserId().equals(userId))
-                .collect(Collectors.toList());
+        return orderRepository.findAllByUserId(userId);
     }
 
     // 주문 취소
