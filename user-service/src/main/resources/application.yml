@@ -1,0 +1,61 @@
+server:
+  port: 8083  # [변경] Gateway(8080)와 충돌 방지
+
+spring:
+  application:
+    name: user-service
+
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ecommerce_user  # [DB 분리] 유저 전용
+    username: root
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # SMTP Configuration (Google)
+  # 회원가입 인증 등 유저 기능 전용
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: madchan0912@gmail.com
+    password: eqiz ymfl hwbd uftz
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+
+# JWT Configuration (Token Issue & Validation)
+jwt:
+  secret: abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ
+  expiration: 86400000
+
+# Logging Levels
+logging:
+  level:
+    com.sparta.ecommerce: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE

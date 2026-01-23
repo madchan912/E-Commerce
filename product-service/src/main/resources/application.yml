@@ -1,0 +1,47 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: product-service
+
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ecommerce_product  # [DB 분리] 상품 전용 DB
+    username: root
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # Spring Batch Configuration
+  batch:
+    jdbc:
+      initialize-schema: always  # BATCH_ 메타 테이블 자동 생성
+    job:
+      enabled: false             # 앱 실행 시 배치 Job 자동 실행 방지
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    registry-fetch-interval-seconds: 5
+  instance:
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+
+# Logging Levels
+logging:
+  level:
+    com.sparta.ecommerce: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE

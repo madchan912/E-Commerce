@@ -1,0 +1,77 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: order-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ecommerce_order  # [DB 분리] 주문 전용 DB
+    username: root
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    registry-fetch-interval-seconds: 5
+  instance:
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+
+# Resilience4j (Circuit Breaker & Retry)
+# 장애 전파 방지 및 회복 탄력성 설정
+resilience4j:
+  circuitbreaker:
+    instances:
+      productClient:
+        # 1. 상태 전환 기준
+        failure-rate-threshold: 50            # 실패율 50% 이상 시 Open
+        slow-call-rate-threshold: 50          # 느린 응답 50% 이상 시 Open
+        slow-call-duration-threshold: 2000    # 2초(2000ms) 초과 시 느린 응답 간주
+
+        # 2. 동작 조건
+        minimum-number-of-calls: 10           # 최소 10건 요청 쌓여야 판단 시작
+        wait-duration-in-open-state: 5000     # Open 상태 유지 시간 (5초 후 Half-Open)
+        permitted-number-of-calls-in-half-open-state: 3 # Half-Open 시 테스트 요청 수
+
+      userClient:
+        # 1. 상태 전환 기준
+        failure-rate-threshold: 50            # 실패율 50% 이상 시 Open
+        slow-call-rate-threshold: 50          # 느린 응답 50% 이상 시 Open
+        slow-call-duration-threshold: 2000    # 2초(2000ms) 초과 시 느린 응답 간주
+
+        # 2. 동작 조건
+        minimum-number-of-calls: 10           # 최소 10건 요청 쌓여야 판단 시작
+        wait-duration-in-open-state: 5000     # Open 상태 유지 시간 (5초 후 Half-Open)
+        permitted-number-of-calls-in-half-open-state: 3 # Half-Open 시 테스트 요청 수
+
+  retry:
+    instances:
+      productClient:
+        max-attempts: 3       # 최대 3회 재시도
+        wait-duration: 500    # 재시도 간격 0.5초
+
+      userClient:
+        max-attempts: 3       # 최대 3회 재시도
+        wait-duration: 500    # 재시도 간격 0.5초
+
+# Logging Levels
+logging:
+  level:
+    com.sparta.ecommerce: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    org.springframework.security: DEBUG
+    # OpenFeign & RestTemplate Logging
+    feign: DEBUG
+    org.springframework.web.client.RestTemplate: DEBUG
