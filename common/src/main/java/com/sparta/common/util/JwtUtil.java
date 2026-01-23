@@ -29,7 +29,7 @@ public class JwtUtil {
     public String generateToken(String eamil) {
         return Jwts.builder()
                 .setSubject(eamil)
-                .claim("auth", role)
+                .claim("auth", "USER")
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(SignatureAlgorithm.HS512, secretKey)
