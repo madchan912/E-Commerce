@@ -5,11 +5,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 
@@ -23,32 +21,43 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private long expirationTime;
 
-    @Autowired
-    @Qualifier("customStringRedisTemplate")
-    private RedisTemplate<String, String> redisTemplate;
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String BEARER_PREFIX = "Bearer ";
 
-    // 토큰 생성
-    public String generateToken(String email) {
+    // 1. 토큰 생성 (이메일 + 권한)
+    // AuthFilter에서 권한(auth)을 꺼내 쓰므로 여기서 넣어주는 게 좋음
+    public String generateToken(String eamil) {
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(eamil)
+                .claim("auth", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
     }
 
-    // 토큰에서 이메일 추출
-    public String extractEmail(String token) {
-        return getClaims(token).getSubject();
+    // 2. 헤더에서 토큰 가져오기
+    public String getJwtFromHeader(HttpServletRequest request) {
+        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        if (StringUtils.hasText(bearerToken) &&  bearerToken.startsWith(BEARER_PREFIX)) {
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 
-    // 토큰이 만료되었는지 확인
-    public boolean isTokenExpired(String token) {
-        return getClaims(token).getExpiration().before(new Date());
+    // 3. 토큰 검증
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            return true;
+        }  catch (Exception e) {
+            log.error("Invalid token: " + e.getMessage());
+            return false;
+        }
     }
 
-    // 토큰에서 클레임(Claims) 추출
-    private Claims getClaims(String token) {
+    // 4. 토큰에서 사용자 정보 가져오기
+    public Claims getUserInfoFromToken(String token) {
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
@@ -57,38 +66,6 @@ public class JwtUtil {
 
     // 만료 시간 가져오기
     public long getExpiration(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.getExpiration().getTime();
+        return getUserInfoFromToken(token).getExpiration().getTime();
     }
-
-    // 블랙리스트에 토큰이 있는지 확인
-    public boolean isTokenBlacklisted(String token) {
-        String key = "blacklist:" + token;
-        return redisTemplate.hasKey(key); // Redis에서 키가 존재하는지 확인
-    }
-
-    // Authorization 헤더에서 JWT 토큰을 추출하는 메서드
-    public String extractTokenFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
-
-    // JWT 토큰의 유효성을 검증하는 메서드
-    public boolean validateToken(String token) {
-        try {
-            // 서명 키를 사용해 토큰의 유효성을 확인
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-            return true; // 유효한 토큰일 경우
-        } catch (Exception e) {
-            log.error("Invalid token: " + e.getMessage());
-            return false; // 유효하지 않은 토큰일 경우
-        }
-    }
-
 }
