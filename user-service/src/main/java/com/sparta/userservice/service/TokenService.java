@@ -1,6 +1,6 @@
 package com.sparta.userservice.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -8,14 +8,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@RequiredArgsConstructor
 public class TokenService {
 
     private final RedisTemplate<String, Object> redisTemplate;
-
-    @Autowired
-    public TokenService(RedisTemplate<String, Object> redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
 
     // 사용자별 토큰 저장
     public void saveUserToken(String userId, String token, long expiration) {
