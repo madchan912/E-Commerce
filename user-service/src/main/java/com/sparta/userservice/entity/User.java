@@ -1,18 +1,19 @@
 package com.sparta.userservice.entity;
 
+import com.sparta.common.entity.Timestamped;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static lombok.AccessLevel.PROTECTED;
+
 @Entity
-@Table(name = "users") // [변경] 표준 이름인 'users'로 변경
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class User {
+@Getter
+@Table(name = "users")
+@NoArgsConstructor(access = PROTECTED)
+public class User extends Timestamped {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,10 +31,11 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum role;
 
-    private boolean isVerified; // 이메일 인증 여부
-    private String phoneNumber; // 전화번호
-    private String address;     // 주소
+    private boolean isVerified;
+    private String phoneNumber;
+    private String address;
 
+    @Builder
     public User(String email, String password, String name, UserRoleEnum role, String phoneNumber, String address) {
         this.email = email;
         this.password = password;
@@ -41,13 +43,18 @@ public class User {
         this.role = role;
         this.phoneNumber = phoneNumber;
         this.address = address;
-        this.isVerified = false; // 기본값
+        this.isVerified = false; // 생성 시점엔 무조건 false
     }
 
-    // [추가] 정보 수정 메서드
+    // 정보 수정 비지니스 로직
     public void update(String name, String phoneNumber, String address) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.address = address;
+    }
+
+    // 권한 변경
+    public void confirmVerification() {
+        this.isVerified = true;
     }
 }

@@ -52,7 +52,6 @@ public class UserService {
                 .role(UserRoleEnum.USER)
                 .phoneNumber(requestDto.getPhoneNumber())
                 .address(requestDto.getAddress())
-                .isVerified(false) // 기본값 명시적으로 넣기도 좋음
                 .build();
 
         User savedUser = userRepository.save(user);
@@ -88,7 +87,7 @@ public class UserService {
         User user = userRepository.findById(verificationToken.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
-        user.setVerified(true);
+        user.confirmVerification();
     }
 
     // 로그인
