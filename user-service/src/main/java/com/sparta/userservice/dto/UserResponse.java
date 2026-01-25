@@ -18,7 +18,7 @@ public class UserResponse {
     private String address;         // 주문 시 자동입력용
     private boolean isVerified;     // 인증 여부
 
-    // [꿀팁] 엔티티를 받아서 DTO로 변환하는 생성자 추가
+    // 엔티티를 받아서 DTO로 변환하는 생성자 추가
     public UserResponse(User user) {
         this.id = user.getId();
         this.email = user.getEmail();

@@ -1,10 +1,10 @@
 package com.sparta.userservice.dto;
 
 import lombok.Getter;
-import org.springframework.stereotype.Service;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Service
+@NoArgsConstructor
 public class SignupRequestDto {
     private String email;
     private String password;
