@@ -12,41 +12,29 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+    // [핵심] Common 모듈 상속 (JPA, Web, Security, Redis, JWT 등 다 가져옴)
+    implementation project(':common')
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    // 이메일 서비스 관련
+    // [Product Service 전용 기능]
     implementation 'org.springframework.boot:spring-boot-starter-mail'
-
-    // JWT 관련
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
-
-    // PostgreSQL 드라이버
-    implementation 'org.postgresql:postgresql:42.2.5'
-
-    // Redis 의존성 추가
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
-    // Redisson
-    implementation 'org.redisson:redisson-spring-boot-starter:3.37.0'
-
-    // jaxb-api 의존성 추가
-    implementation 'javax.xml.bind:jaxb-api:2.3.1'
-    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1'
-
-    // Eureka 의존성 추가
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
-    // Spring Batch
+    // [Spring Batch] - 대량 상품 등록/상태 변경 등 배치 작업용
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     testImplementation 'org.springframework.batch:spring-batch-test'
 
-    implementation project(':common')
+    // [Redisson] - 상품 재고 관리 시 동시성 제어(분산 락)를 위해 필수
+    implementation 'org.redisson:redisson-spring-boot-starter:3.37.0'
+
+    // [DB 드라이버]
+    runtimeOnly 'org.postgresql:postgresql:42.2.5'
+
+    // [Lombok]
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // [Test] (테스트 라이브러리는 보통 상속되지 않으므로 명시)
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 dependencyManagement {
@@ -57,5 +45,4 @@ dependencyManagement {
 
 tasks.withType(Test) {
     useJUnitPlatform()
-//    enabled = false
 }

@@ -12,11 +12,13 @@ repositories {
 }
 
 dependencies {
-    // Eureka Server 관련 의존성
+    // Eureka Server (핵심)
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+
+    // Web (유레카 대시보드 화면용)
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // 테스트 의존성
+    // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
@@ -24,4 +26,8 @@ dependencyManagement {
     imports {
         mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2023.0.3'
     }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }

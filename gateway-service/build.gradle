@@ -12,16 +12,20 @@ repositories {
 }
 
 dependencies {
-    // Spring Cloud Gateway
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    // Spring Cloud Gateway (핵심)
     implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
+
+    // Eureka Client (디스커버리 연동)
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+    // Actuator (상태 모니터링)
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // Lombok
-    implementation 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // Test dependencies
+    // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 

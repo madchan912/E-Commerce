@@ -12,32 +12,19 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-
-    // 이메일 서비스 관련
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
-
-    // JWT 관련
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
-
-    // PostgreSQL 드라이버
-    implementation 'org.postgresql:postgresql:42.2.5'
-
-    // Redis 의존성 추가
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
-    // jaxb-api 의존성 추가
-    implementation 'javax.xml.bind:jaxb-api:2.3.1'
-    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1'
-
-    // Eureka 의존성 추가
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-
+    // [핵심] Common 모듈 상속 (JPA, Web, Security, Redis, JWT 등 다 가져옴)
     implementation project(':common')
+
+    // [User Service 전용 기능]
+    implementation 'org.springframework.boot:spring-boot-starter-mail' // 이메일 인증
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client' // 유레카 클라이언트
+
+    // [DB 드라이버]
+    runtimeOnly 'org.postgresql:postgresql:42.2.5'
+
+    // [Lombok] (Annotation Processor는 각 모듈마다 선언 필요)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 }
 
 dependencyManagement {
