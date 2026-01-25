@@ -38,6 +38,12 @@ eureka:
     lease-renewal-interval-in-seconds: 5
     lease-expiration-duration-in-seconds: 10
 
+# JWT Configuration (Token Issue & Validation)
+jwt:
+  secret: 9z8Xc7Vb6N5mQ4w3E2r1T0y9U8i7O6p5A4s3D2f1G0h9J8k7L6z5x4C3v2B1n0M9qW8e7R6t5Y4u3I2o1P0SafeKeyLongEnough
+  expiration: 86400000
+
+
 # Logging Levels
 logging:
   level:

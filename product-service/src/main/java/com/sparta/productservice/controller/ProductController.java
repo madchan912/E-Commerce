@@ -1,84 +1,66 @@
 package com.sparta.productservice.controller;
 
+import com.sparta.productservice.dto.ProductDetailResponse;
 import com.sparta.productservice.dto.ProductResponse;
-import com.sparta.productservice.entity.Product;
+import com.sparta.productservice.dto.ProductSaveRequestDto;
 import com.sparta.productservice.entity.ProductDetail;
 import com.sparta.productservice.service.ProductService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/products")
+@RequiredArgsConstructor
 public class ProductController {
 
     private final ProductService productService;
 
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
-
     /**
-     * 상품을 등록합니다.
-     *
-     * @param product 등록할 상품 정보
+     * 상품 등록
      */
     @PostMapping
-    public void createProduct(@RequestBody Product product) {
-        ProductDetail productDetail = product.getProductDetail();
-        productDetail.setProduct(product);
-        productService.saveProductWithDetail(product, productDetail);
+    public ProductResponse createProduct(@RequestBody @Valid ProductSaveRequestDto requestDto) {
+        return productService.createProduct(requestDto);
     }
 
     /**
-     * 모든 상품을 조회합니다.
-     *
-     * @return 상품 목록
+     * 전체 상품 조회
      */
     @GetMapping
-    public List<Product> getAllProducts() {
+    public List<ProductResponse> getAllProducts() {
         return productService.getAllProducts();
     }
 
     /**
-     * ID로 특정 상품을 조회합니다.
-     *
-     * @param id 조회할 상품의 ID
-     * @return 조회된 상품 정보
+     * 단건 상품 조회
      */
     @GetMapping("/{id}")
     public ProductResponse getProductById(@PathVariable Long id) {
-        Product product = productService.getProductById(id);
-        return new ProductResponse(product.getId(), product.getName(), product.getPrice());
+        return productService.getProductById(id);
     }
 
     /**
-     * 특정 상품의 상세 정보를 조회합니다.
-     *
-     * @param productId 상품 ID
-     * @return 상품 상세 정보
+     * 상품 상세 정보 조회
      */
     @GetMapping("/{productId}/details")
-    public ProductDetail getProductDetail(@PathVariable Long productId) {
-        return productService.getProductDetail(productId);
+    public ProductDetailResponse getProductDetail(@PathVariable Long productId) {
+        ProductDetail detail = productService.getProductDetail(productId);
+        return new ProductDetailResponse(detail);
     }
 
     /**
-     * 특정 상품의 정보를 업데이트합니다.
-     *
-     * @param id 업데이트할 상품의 ID
-     * @param productDetails 업데이트할 상품 정보
-     * @return 업데이트된 상품 정보
+     * 상품 정보 수정
      */
     @PutMapping("/{id}")
-    public Product updateProduct(@PathVariable Long id, @RequestBody Product productDetails) {
-        return productService.updateProduct(id, productDetails);
+    public ProductResponse updateProduct(@PathVariable Long id, @RequestBody ProductSaveRequestDto requestDto) {
+        return productService.updateProduct(id, requestDto.toEntity());
     }
 
     /**
-     * 특정 상품을 삭제합니다.
-     *
-     * @param id 삭제할 상품의 ID
+     * 상품 삭제
      */
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {
